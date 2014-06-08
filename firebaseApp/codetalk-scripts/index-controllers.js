@@ -1,4 +1,5 @@
 app.controller('FirebaseCtrl', function($scope, $firebase) {
+
     //Initialize Firebase Authentication
     var fire = new Firebase('https://codetalking.firebaseio.com');
     var fireAuth = new FirebaseSimpleLogin(fire, function(error, user) {
@@ -93,9 +94,10 @@ app.controller('LandingCtrl', function($scope, $cookies, $location, $cookieStore
 		.error(function(data) {
 			var error = data.error;
 			var showError = error.charAt(0).toUpperCase() + error.slice(1);
-            $('.alert-login').empty();
-			$('.alert-login').append('<p>'+showError+'</p>');
-			$('.alert-login').show();
+            $('.alert-login')
+                .empty()
+			    .append('<p>'+showError+'</p>')
+			    .show();
             $('#loginUsername').val('');
             $('#loginPassword').val('');                    
 		}); 
@@ -292,6 +294,6 @@ app.controller('HomeCtrl', function($scope, parseObjFactory, userFactory) {
     
 });
 
-app.controller('NavPubCtrl', function($scope, $cookies) {
+app.controller('NavPubCtrl', function($scope) {
     $scope.state = "Public";
 });
