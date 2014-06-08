@@ -1,0 +1,117 @@
+
+
+	<div class="mainFeature">
+		<div class="container">
+			<div class="row">
+				<div class="col-xs-8">
+					<div class="jumbotron">
+						<h2>Welcome to CodeTalk</h2>
+						<ul class="jumboList">
+                            <li>&check; Supports over 100 programming languages</li>
+                            <li>&check; Share your code and get feedback on it</li>
+                            <li>&check; Sharpen your skills by suggesting improvements on others code</li>
+                        </ul>
+                        <div class="jumboHeader">
+                            <button class="btn btn-primary btn-lg btn-jumbo" data-toggle="modal" data-target=".getStartedModal">Start CodeTalking</button>
+                        </div>						
+					</div>
+				</div>
+                <div class="col-xs-4">
+                </div>
+			</div> <!-- Main Row -->
+		</div> <!-- Container -->
+	</div> <!-- mainFeaturea -->
+
+
+	<div class="secondFeature">
+		<div class="container">
+			<div class="row featureRow">
+			<div class="text-center">
+				<div class="col-xs-4">
+				    <i class="fa fa-cogs cogsFeature"></i>
+				    <div class="featureHeader1">Code</div>
+                    <div class="featureText">High performance code editor with syntax highlighting in more than 100 different programming languages !</div>
+				</div>
+				<div class="col-xs-4">
+		  			<span class="fa-stack fa-lg stackFeature">
+			  			<i class="fa fa-comment fa-fw fa-stack-2x"></i>
+			  			<i class="fa fa-cogs fa-fw fa-stack-1x"></i>
+		  			</span>				    
+					<div class="featureHeader2">CodeTalk</div>
+                    <div class="featureText">Suggest improvements on others code and get your own code improved with the help of our community !</div>
+				</div>
+				<div class="col-xs-4">
+					<i class="fa fa-comment commentFeature"></i>
+					<div class="featureHeader3">Talk</div>
+                    <div class="featureText">Share your code with a friend, a private group or with the entire community !</div>
+				</div>
+			</div>
+			</div>
+		</div>
+	</div>
+
+
+
+<div class="modal fade getStartedModal" tabindex="-1" role="dialog" aria-labelledby="getStartedModal" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="getStartedModalLabel">Get Talking</h4>
+      </div>
+      <div class="modal-body">
+	      <div class="row">
+	      	<div class="col-xs-5">
+		      	<div class="text-center">
+		      		<h4>Register</h4>
+		      	</div>
+	          <form role="form" ng-submit="registerSubmit()">
+	            <div class="form-group">
+	              <label for="registerUsername">Username</label>
+	              <input type="name" class="form-control" id="registerUsername" ng-model="register.name">
+	            </div>          
+	            <div class="form-group">
+	              <label for="registerPassword">Password</label>
+	              <input type="password" class="form-control" id="registerPassword" ng-model="register.pass">
+	            </div>
+	            <div class="form-group">
+	              <label for="registerEmail">E-mail</label>
+	              <input type="email" class="form-control" id="registerEmail" ng-model="register.email">
+	            </div>            
+			    <div class="text-center">
+			    	<button type="submit" class="btn btn-default">Submit</button>
+			    </div>
+			    <div class="alert alert-danger alert-register-error"></div>	        
+			    <div class="alert alert-success alert-register-success"></div>	        
+	          </form>			      	
+	      	</div>
+	      	<div class="col-xs-2 text-center">
+	      		<img src="codetalk-img/PopUp_Login_OR.png" />
+	      	</div>
+	      	<div class="col-xs-5">
+		      	<div class="text-center">
+		      		<h4>Login</h4>
+		      	</div>
+				<form role="form" ng-submit="loginSubmit()">
+				    <div class="form-group">
+				      <label for="loginUsername">Username</label>
+				      <input type="name" class="form-control" id="loginUsername" ng-model="login.name">
+				    </div>
+				    <div class="form-group">
+				      <label for="loginPassword">Password</label>
+				      <input type="password" class="form-control" id="loginPassword" ng-model="login.pass">
+				    </div>
+				    <div class="text-center">
+				    	<button type="submit" class="btn btn-default">Submit</button>
+				    </div>
+					<div class="alert alert-danger alert-login"></div>		            
+			  	</form>
+                <div class="social-login-btn">
+                    <button class="btn btn-google-plus btn-md" ng-click="googleLogin()">Login with Google</button>
+                </div>
+	      	</div>
+	      </div>    
+	  </div>
+    </div>
+  </div>
+</div>
