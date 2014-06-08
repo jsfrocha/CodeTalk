@@ -106,11 +106,13 @@ app.controller('LandingCtrl', function($scope, $cookies, $location, $cookieStore
         userFactory.doRegister(user.name, user.pass, user.email)
         .success(function(data) {
             var showSuccess = "You are now registered !"
-            $('.alert-register-error').empty();
-            $('.alert-register-error').hide();
-            $('.alert-register-success').empty();
-            $('.alert-register-success').append('<p>'+showSuccess+'</p>');
-            $('.alert-register-success').show();
+            $('.alert-register-error')
+                .empty()
+                .hide();
+            $('.alert-register-success')
+                .empty()
+                .append('<p>'+showSuccess+'</p>')
+                .show();
             $('#registerEmail').val('');
             $('#registerUsername').val('');
             $('#registerPassword').val(''); 
@@ -118,11 +120,11 @@ app.controller('LandingCtrl', function($scope, $cookies, $location, $cookieStore
         .error(function(data) {
             var error = data.error;
             var showError = error.charAt(0).toUpperCase() + error.slice(1);
-            $('.alert-register-success').empty();
-            $('.alert-register-success').hide();
-            $('.alert-register-error').empty();
-            $('.alert-register-error').append('<p>'+showError+'</p>');
-            $('.alert-register-error').show();
+            $('.alert-register-success').empty().hide();
+            $('.alert-register-error')
+                .empty()
+                .append('<p>'+showError+'</p>')
+                .show();
             $('#registerEmail').val('');
             $('#registerUsername').val('');
             $('#registerPassword').val('');                    
@@ -171,7 +173,7 @@ app.controller('HomeCtrl', function($scope, parseObjFactory, userFactory) {
         $scope.saveLoader = true;
         var newNote = {
             'noteTitle': $scope.newNote.title,
-            'noteDescription': $scope.newNote.description,
+            'noteDescription': $scope.newNote.description
         };
 
         if ($('#inputTitle').val() == '') {
