@@ -1,0 +1,13 @@
+<div class="mainFirebase">
+    <div class="centerStuff"><h2>Testing Firebase</h2></div> 
+    <div class="messagesDiv">
+        <ul class="messagesList">
+            <li ng-repeat="(id, msg) in messages">
+                <h4><strong>{{msg.from}} </strong> {{msg.body}}</h4>
+                <button ng-click="removeMessage(id)">Remove</button>
+            </li>
+        </ul>
+    </div>
+    <input type="text" ng-model="name" placeholder="Name">
+    <input type="text" ng-model="msg" ng-keydown="addMessage($event)" placeholder="Message...">
+</div>

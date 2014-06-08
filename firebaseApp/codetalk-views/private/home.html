@@ -1,0 +1,60 @@
+<div class="container ct-home-main" ng-controller="HomeCtrl">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="ct-inner-title">
+                Code
+            </div>
+            <div id="editor-actions">
+                <label>Select a mode for the Editor &nbsp;&nbsp;&nbsp;</label>
+                <i id="selectorLoader" class="fa fa-cog fa-spin" ng-show="selectorLoader"></i>
+                <select id="aceModeSelector" ng-change="setMode()" ng-model="selectedMode" title="choose" ng-show="!selectorLoader">
+                    <option selected>Choose one...</option>
+                    <option ng-repeat="aceMode in aceModes" value="{{aceMode.modeCode}}">{{aceMode.modeName}}</option>
+                </select>
+            </div>
+            <div id="code-editor" ng-show="hasCode"></div>
+        </div>
+        <div class="col-md-6">
+            <div class="ct-inner-title">
+                Talk
+            </div>
+            <div class="note-block active">
+                <div class="note-title">
+                    <input id="inputTitle" type="text" placeholder="Note Title" ng-model="newNote.title" />
+                    <div id="titleAlert" class="alert alert-danger alert-dismissable">
+                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                        <strong>Warning!</strong> The note must have a title.
+                    </div>
+                </div>
+                <div class="note-description">
+                    <textarea id="inputDescription" rows="4" placeholder="Note Description" ng-model="newNote.description"></textarea>
+                </div>
+                <div class="note-btn-group">
+                    <button class="btn btn-primary btn-md" ng-show="!noteHasCode" ng-click="addCode(-1)" ng-cloak><i class="fa fa-plus"></i>&nbsp;&nbsp;Add Current Code</button>
+                    <h5 ng-show="noteHasCode" ng-cloak>Mode: {{note.codeMode}}</h5>
+                    <button class="btn btn-success btn-md pull-right" ng-click="saveNote()">
+                        <i class="fa fa-check" ng-show="!saveLoader" ng-cloak></i>
+                        <i id="saveLoader" class="fa fa-cog fa-spin" ng-show="saveLoader" ng-cloak></i>
+                    &nbsp;&nbsp;Save</button>
+                </div>
+            </div>
+            <div class="note-block note-loader" ng-show="noteLoader" ng-cloak>
+                <i id="noteLoader" class="fa fa-cog fa-spin"></i>
+            </div>
+            <div class="note-block" ng-repeat="note in notes | orderBy : 'createdAt' : true" ng-show="!noteLoader" ng-cloak>
+                <div class="note-title">{{note.noteTitle}} <h4 class="pull-right">{{note.createdAt | date : 'MMM dd, yyyy @ hh:mm:ss'}}</h4></div>
+                <div class="note-description">{{note.noteDescription}}</div>
+                <div class="note-btn-group">
+                    <button class="btn btn-primary btn-md" ng-hide="{{note.hasCode}}" ng-click="addCode(note)" ng-cloak><i class="fa fa-plus"></i>&nbsp;&nbsp;Add Current Code</button>
+                    <button class="btn btn-danger btn-md pull-right" ng-click="deleteNote(note)">
+                        <i class="fa fa-times" ng-show="!deleteLoader"></i>
+                        <i class="fa fa-cog fa-spin" ng-show="deleteLoader"></i>
+                    &nbsp;&nbsp;Delete</button>
+                    <h5 ng-show="{{note.hasCode}}" ng-cloak>Mode: {{note.noteMode}}</h5>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="codetalk-scripts/editor.js"></script>

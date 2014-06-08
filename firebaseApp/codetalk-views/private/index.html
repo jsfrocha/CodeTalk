@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="privateApp">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <title>CodeTalk - Start</title>
+
+    <link href='http://fonts.googleapis.com/css?family=Roboto:100, 200,400,300,500,700|Roboto+Condensed:400,700|Roboto+Slab' rel='stylesheet' type='text/css'>
+    <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="font-awesome/css/font-awesome.min.css" rel="stylesheet">
+    <link href="codetalk-css/jasny-bootstrap.min.css" rel="stylesheet">
+    <link href="codetalk-css/landing.css" rel="stylesheet">
+    <link href="codetalk-css/main.css" rel="stylesheet">
+    <link href="codetalk-css/animations.css" rel="stylesheet">
+
+  </head>
+
+  <body ng-cloak>
+
+	<nav class="navbar navbar-default navbar-fixed-top navbar-landing" role="navigation" ng-controller="NavbarCtrl" >
+	  	<div class="container">
+	  		<div class="navbar-header">
+	  			<a class="navbar-brand" href="#">
+	  			<span class="fa-stack fa-lg">
+		  			<i class="fa fa-comment fa-stack-2x"></i>
+		  			<i class="fa fa-cogs fa-stack-1x"></i>
+	  			</span>
+	  			<div id="brandTitle">CodeTalk Private</div>
+	  			</a>
+	  		</div>
+		
+	  	</div>
+  	</nav>
+
+	 
+    <div class="view-animate" ng-view></div>
+  
+
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js" ></script>
+    <script src="bootstrap/js/bootstrap.min.js"></script>
+    <script src="angular/angular.js"></script>
+    <script src="angular/angular-cookies.js"></script>
+    <script src="angular/angular-route.js"></script>
+    <script src="angular/angular-animate.js"></script>
+    <script src="codetalk-scripts/index-private.js"></script>
+
+  </body>
+</html>

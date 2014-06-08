@@ -1,0 +1,24 @@
+{
+    "users": {
+        "user1": {
+            "ID": "fakeID",
+            "Email": "fakeEmail",
+            "notes": {
+                "note1": {
+                    "title": "fakeTitle",
+                    "description": "fakeDescription",
+                    "noteCode": {
+                        "code": "fakeCode",
+                        "mode": "fakeMode"
+                    }
+                }
+            }
+        }
+    }
+    
+    "groups": {
+        "group1": {
+            
+        }
+    }
+}

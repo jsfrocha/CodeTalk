@@ -1,0 +1,73 @@
+.navbar-default {
+	background-color: #ffffff;
+	border-bottom: 1px solid #FF6600;
+	border-radius: 0px;
+	-webkit-box-shadow: 0px 1px 1px #FF9900;
+	-moz-box-shadow: 0px 1px 1px #FF9900;
+	box-shadow: 0px 1px 1px #FF9900;
+}
+
+#brandTitle {
+	font-size: 50px;
+	font-family: 'Roboto', sans-serif;
+	display: inline-block;
+	padding-top: 25px;
+	margin-left: 20px;
+}
+
+.menuItem > a,
+.menuItem-private > a {
+	line-height: 70px !important;
+	font-size: 25px;
+	font-family: 'Roboto', sans-serif;
+	font-weight: 300;
+	margin-bottom: -1px;
+}
+
+.menuItem-private > a
+{
+	padding-left: 25px;
+	padding-right: 25px;
+}
+
+.navbar-default .navbar-nav > .open > a,
+.navbar-default .navbar-nav > .open > a:hover {
+	background-color: #ebebeb;
+	margin-bottom: -2px;
+}
+
+.menuItem-private.open {
+	background-color: #ebebeb;
+}
+
+.menuItem,
+{
+	padding-left: 25px;
+	padding-right: 25px;
+}
+
+.navbar-right .dropdown-menu {
+	min-width: 178px;
+	
+}
+
+.dropdown-menu > .menuItem > a {
+	font-family: 'Roboto', sans-serif;
+	font-size: 16px;
+	font-weight: 300;
+}
+
+
+
+.menuItem:hover,
+.menuItem-private:hover
+{
+	background-color: #ebebeb;
+	cursor: pointer;
+}
+
+
+.nav .open > a {
+	background-color: transparent;
+	border-color: transparent;
+}

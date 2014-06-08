@@ -1,0 +1,28 @@
+	<nav class="navbar navbar-default navbar-fixed-top navbar-landing" role="navigation" ng-controller="NavbarCtrl">
+	  	<div class="container">
+	  		<div class="navbar-header">
+	  			<a class="navbar-brand" href="#">
+		  			<span class="fa-stack fa-lg">
+			  			<i class="fa fa-comment fa-stack-2x"></i>
+			  			<i class="fa fa-cogs fa-stack-1x"></i>
+		  			</span>
+		  			<div id="brandTitle">CodeTalk</div>
+	  			</a>
+	  		</div>
+	  		<ul class="nav navbar-nav navbar-right">
+			<li class="dropdown menuItem-private">
+	          <a class="dropdown-toggle" data-toggle="dropdown">My Account <b class="caret"></b></a>
+	          <ul class="dropdown-menu">
+	            <li class="menuItem"><a href="#home">{{$cookies.username}}</a></li>
+	            <li class="menuItem"><a href="#">Discussions</a></li>
+	            <li class="menuItem"><a href="#">History</a></li>
+	            <li class="divider"></li>
+	            <li class="menuItem"><a href="#">Settings</a></li>
+	            <li class="divider"></li>
+	            <li class="menuItem"><a ng-click="logout()">Logout</a></li>
+	          </ul>
+	        </li>
+	  		</ul>	  		
+
+	  	</div>
+  	</nav>

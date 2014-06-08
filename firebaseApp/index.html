@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="indexApp">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <title>CodeTalk</title>
+
+    <link href='http://fonts.googleapis.com/css?family=Roboto:100, 200,400,300,500,700|Roboto+Condensed:400,700|Roboto+Slab' rel='stylesheet' type='text/css'>
+    <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="font-awesome/css/font-awesome.min.css" rel="stylesheet">
+    <link href="bootstrap/css/bootstrap-social.css" rel="stylesheet">
+    <link href="codetalk-css/landing.css" rel="stylesheet">
+    <link href="codetalk-css/nav.css" rel="stylesheet">
+    <link href="codetalk-css/animations.css" rel="stylesheet">
+    <link href="codetalk-css/home.css" rel="stylesheet">
+    <link href="codetalk-css/start.css" rel="stylesheet">
+    <link href="codetalk-css/firebase.css" rel="stylesheet">
+
+  </head>
+
+  <body ng-cloak>
+
+  <div id="nav-public" navpublic></div>
+  <div id="nav-private" navprivate class="hide"></div>
+	 
+  <div ng-view></div>
+  
+
+<script src="jquery/jquery-1.11.0.js"></script>
+<script src="bootstrap/js/bootstrap.min.js"></script>
+<script src="angular/angular.js"></script>
+<script src="angular/angular-cookies.js"></script>
+<script src="angular/angular-route.js"></script>
+<script src="angular/angular-animate.js"></script>
+<script src="firebase/firebase.js"></script>
+<script src="firebase/firebase-simple-login.js"></script>
+<script src="angularfire/angularfire.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/ace/1.1.3/ace.js"></script>
+<script src="codetalk-scripts/index-routes.js"></script>
+<script src="codetalk-scripts/index-controllers.js"></script>
+<script src="codetalk-scripts/index-factories.js"></script>
+<script src="codetalk-scripts/index-directives.js"></script>
+<script src="codetalk-scripts/utils.js"></script>
+
+
+  </body>
+</html>

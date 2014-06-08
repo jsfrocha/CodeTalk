@@ -1,0 +1,103 @@
+<div class="container ct-home-main">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="ct-inner-title">
+                Start Codetalking
+            </div>
+            <table class="table table-striped table-bordered table-hover ct-table-start">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Created Date</th>
+                        <th>Actions</th>
+                    </tr>
+                    <tbody data-link="row" class="rowlink">
+                        <tr class="ct-tr-rowlink">
+                            <td><a href="#testrow1" class="ct-rowlink">Row 1</a></td>
+                            <td>Description Row 1</td>
+                            <td>Created Date Row 1</td>
+                            <td>Actions Row 1</td>
+                        </tr>
+                        <tr class="ct-tr-rowlink">
+                            <td><a href="#testrow1" class="ct-rowlink">Row 2</a></td>
+                            <td>Description Row 2</td>
+                            <td>Created Date Row 2</td>
+                            <td>Actions Row 2</td>
+                        </tr>
+                        <tr class="ct-tr-rowlink">
+                            <td><a href="#testrow3" class="ct-rowlink">Row 3</a></td>
+                            <td>Description Row 3</td>
+                            <td>Created Date Row 3</td>
+                            <td>Actions Row 3</td>
+                        </tr>
+                        <tr class="ct-tr-rowlink">
+                            <td colspan="4" class="ct-rowlink-add">Add Code</td>
+                        </tr>                           
+                    </tbody>
+                </thead>
+            </table>
+        </div>    
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="ct-inner-title">
+                Upload
+            </div>
+            <div class="well ct-file-drop" ng-file-over>
+                Drop here
+            </div>
+            <input id="ct-file-select" ng-file-select type="file" multiple>
+            
+            
+            <table class="table">
+                <thead>
+                    <th width="50%">Name</th>
+                    <th>Size</th>
+                    <th>Progress</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="item in uploader.queue" class="ng-scope">
+                        <td>
+                            <strong class="ng-binding">Previously Uploaded File</strong>
+                        </td>
+                        <td nowrap class="ng-binding">0.95MB</td>
+                        <td>
+                            <div class="progress" style="margin-bottom: 0;">
+                                <div class="progress-bar" role="progressbar" ng-style="{ 'width':item.progress + '%' }" style="width: 100%;"></div>
+                            </div>
+                        </td>
+                        <td class="text-center">
+                            <span ng-show="item.isSuccess">
+                                <i class="fa fa-check"></i>
+                            </span>
+                            <span ng-show="item.isCancel">
+                                <i class="fa fa-times"></i>
+                            </span>
+                            <span ng-show="item.isError">
+                                <i class="fa fa-exclamation"></i>
+                            </span>
+                        </td>
+                        <td nowrap>
+                            <button type="button" class="btn btn-danger btn-xs" ng-click="item.remove()"><i class="fa fa-times"></i></button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            </div>
+        
+                
+        <div class="col-md-6">
+            <div class="ct-inner-title">
+                Paste
+            </div>
+            <div id="code-editor">
+            </div>
+        </div>
+    </div>
+</div>
+    
+<script src="codetalk-scripts/jasny-bootstrap.min.js"></script>
+<script src="codetalk-scripts/editor-start.js"></script>
