@@ -1,4 +1,4 @@
-app.factory('authFactory', )
+//app.factory('authFactory', )
 
 //User Access Factory
 app.factory('userFactory', function($http, $cookies, $rootScope) {
