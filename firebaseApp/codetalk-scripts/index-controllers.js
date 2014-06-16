@@ -275,7 +275,6 @@ app.controller('HomeCtrl', function($scope, parseObjFactory, userFactory) {
             parseObjFactory.associateCode(data.name, code.mode, 'CodeChanges')
             .success(function(data) {
                 console.log("SUCCESS - Associate Code FROM SCOPE\n"+angular.toJson(data));
-                
             })
             .error(function(data) {
                 console.log("ERROR - Associate Code FROM SCOPE\n"+angular.toJson(data));

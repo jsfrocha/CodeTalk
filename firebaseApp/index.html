@@ -21,8 +21,8 @@
 
   <body ng-cloak>
 
-  <div id="nav-public" navpublic></div>
-  <div id="nav-private" navprivate class="hide"></div>
+  <div id="nav-public" navpublic ng-hide="user"></div>
+  <div id="nav-private" navprivate ng-show="user"></div>
 	 
   <div ng-view></div>
   
@@ -37,10 +37,16 @@
 <script src="firebase/firebase-simple-login.js"></script>
 <script src="angularfire/angularfire.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/ace/1.1.3/ace.js"></script>
+<script src="codetalk-scripts/app.js"></script>
+  <!--
 <script src="codetalk-scripts/index-routes.js"></script>
 <script src="codetalk-scripts/index-controllers.js"></script>
 <script src="codetalk-scripts/index-factories.js"></script>
+
 <script src="codetalk-scripts/index-directives.js"></script>
+
+-->
+
 <script src="codetalk-scripts/utils.js"></script>
 
 
