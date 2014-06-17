@@ -37,7 +37,7 @@ run(function($rootScope, $location, $firebaseSimpleLogin) {
             if (next.templateUrl == "codetalk-views/public/landing.html" ||
                 next.templateUrl == "codetalk-views/public/about.html" ||
                 next.templateUrl == "codetalk-views/public/contact.html" ||
-                next.templateUrl == "codetalk-views/private/firebase.html") {
+                next.templateUrl == "codetalk-views/private/groups.html") {
                 //Already going to landing, no redirect needed
             } else {
                 //Not going to landing, needs to redirect

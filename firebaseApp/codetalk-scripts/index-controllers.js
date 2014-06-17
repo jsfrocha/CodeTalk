@@ -32,7 +32,7 @@ app.controller('FirebaseCtrl', function($scope, $firebase) {
 });
 */
 
-app.controller('NavbarCtrl', function($scope, $cookies, $rootScope, $location, $firebaseSimpleLogin) {
+app.controller('NavbarCtrl', function($scope, $rootScope) {
 
     console.log("Enter NavbarCtrl, RootScope Auth: "+angular.toJson($rootScope.auth));
 
@@ -56,6 +56,9 @@ app.controller('NavbarCtrl', function($scope, $cookies, $rootScope, $location, $
                         console.log("Stuff in Auth RootScope: "+angular.toJson($rootScope.auth));
                         $scope.user = user;
                         console.log("Stuff in User: "+angular.toJson($scope.user));
+                        if (!$scope.$$phase) {  //SAFE APPLY TO ANGULAR
+                            $scope.$apply();
+                        }
                     }, function(error) {
                         console.log("Error creating user: "+angular.toJson(error));
                 })
@@ -63,6 +66,35 @@ app.controller('NavbarCtrl', function($scope, $cookies, $rootScope, $location, $
         })
     }
 });
+
+//Groups Page Controller
+app.controller('GroupsCtrl', function($scope, $rootScope, $firebase) {
+
+    $scope.groupsAlert = {
+        alertType: "",
+        message: "",
+        isShown: false
+    };
+
+    function showAlert(alertType, message) {
+        $scope.groupsAlert.message = message;
+        $scope.groupsAlert.isShown = true;
+        $scope.groupsAlert.alertType = alertType;
+    }
+
+    $scope.closeAlert = function () {
+        $scope.groupsAlert.isShown = false;
+    }
+
+
+    $scope.createGroup = function () {
+        //Create Firebase 'Group' in 'groups' with Name Entered
+        //Add current user to group.rels.users
+        //Set group.isPrivate to 'true'
+    }
+
+});
+
 //Landing Controller
 app.controller('LandingCtrl', function($scope, $cookies, $location, $cookieStore, $rootScope, userFactory) {
 /*

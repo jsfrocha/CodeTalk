@@ -1,0 +1,25 @@
+<div class="container mainGroupsSection" ng-controller="GroupsCtrl">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ct-column-title">
+                Create or Join a Group
+            </div>
+            <div class="groupsPanel">
+                <div class="alert {{groupsAlert.alertType}}" ng-show="groupsAlert.isShown">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true" ng-click="closeAlert()">&times;</button>
+                    {{groupsAlert.message}}
+                </div>
+                <form class="form-inline groupsForm" ng-submit="createGroup()">
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Group Name" ng-model="newGroupName">
+                        <button type="submit" class="btn btn-success">Create</button>
+                    </div>
+                </form>
+                <ul class="nav nav-pills nav-stacked">
+                    <li><a href="#">Group 1</a></li>
+                    <li><a href="#">Group 2</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
