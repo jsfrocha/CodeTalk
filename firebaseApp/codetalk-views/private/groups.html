@@ -11,11 +11,12 @@
                 </div>
                 <form class="form-inline groupsForm" ng-submit="createGroup()">
                     <div class="form-group">
-                        <input type="text" class="form-control" placeholder="Group Name" ng-model="newGroupName">
+                        <input type="text" class="form-control" placeholder="Group Name" ng-model="newGroupName" id="new-groupname-input">
                         <button type="submit" class="btn btn-success">Create</button>
                     </div>
                 </form>
                 <ul class="nav nav-pills nav-stacked">
+                    <li ng-repeat="group in groups"><a href="#">{{group.name}}</a></li>
                     <li><a href="#">Group 1</a></li>
                     <li><a href="#">Group 2</a></li>
                 </ul>

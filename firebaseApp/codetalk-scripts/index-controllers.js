@@ -32,7 +32,8 @@ app.controller('FirebaseCtrl', function($scope, $firebase) {
 });
 */
 
-app.controller('NavbarCtrl', function($scope, $rootScope) {
+app.controller('NavbarCtrl', function($scope, $rootScope, $firebase) {
+    var usersRef = $firebase(new Firebase("https://codetalking.firebaseio.com/users"));
 
     console.log("Enter NavbarCtrl, RootScope Auth: "+angular.toJson($rootScope.auth));
 
@@ -54,7 +55,10 @@ app.controller('NavbarCtrl', function($scope, $rootScope) {
                     .then(function(user) {
                         //Add user to firebase and angular
                         console.log("Stuff in Auth RootScope: "+angular.toJson($rootScope.auth));
-                        $scope.user = user;
+                        $scope.user = user; //Not sure if needed
+                        usersRef.$add({
+                            email: user.email
+                        });
                         console.log("Stuff in User: "+angular.toJson($scope.user));
                         if (!$scope.$$phase) {  //SAFE APPLY TO ANGULAR
                             $scope.$apply();
@@ -69,6 +73,9 @@ app.controller('NavbarCtrl', function($scope, $rootScope) {
 
 //Groups Page Controller
 app.controller('GroupsCtrl', function($scope, $rootScope, $firebase) {
+    var groupsRef = $firebase(new Firebase("https://codetalking.firebaseio.com/groups"))
+
+    $scope.groups = groupsRef;
 
     $scope.groupsAlert = {
         alertType: "",
@@ -89,8 +96,17 @@ app.controller('GroupsCtrl', function($scope, $rootScope, $firebase) {
 
     $scope.createGroup = function () {
         //Create Firebase 'Group' in 'groups' with Name Entered
-        //Add current user to group.rels.users
-        //Set group.isPrivate to 'true'
+
+        $scope.groups.$add({
+            name: $scope.newGroupName,
+            isPrivate: true //Set group.isPrivate to 'true'
+        })
+            .then(function(ref) { //TODO: Add Current user inside the newly created group - WIP
+                var groupRef = $firebase(new Firebase("https://codetalking.firebaseio.com/groups/"+ref.name()));
+
+            });
+
+        angular.element('#new-groupname-input').val('');
     }
 
 });
