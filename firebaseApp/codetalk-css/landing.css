@@ -1,25 +1,26 @@
-.fa-lg {
-	font-size: 32px;
-	margin-top: -35px;
+.codetalk-views {
+    margin-top: -20px;
 }
 
-[ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak],
-.ng-cloak, .x-ng-cloak,
-.ng-hide {
-  display: none !important;
+.navbar-default {
+    background-color: #ffffff;
+    border-bottom: 1px solid #FF6600;
+    border-radius: 0px;
+    -webkit-box-shadow: 0px 1px 1px #FF9900;
+    -moz-box-shadow: 0px 1px 1px #FF9900;
+    box-shadow: 0px 1px 1px #FF9900;
 }
 
-ng\:form {
-  display: block;
+.navbar-logo {
+    bottom: 10px;
+    margin-right: 5px;
 }
 
-.colLogin {
-
-	text-align: center;
-}
-
-.navbar-landing {
-	height: 100px;
+.navbar-brand-codetalk {
+    display: inline;
+    font-weight: 400;
+    font-size: 25px;
+    font-family: 'Roboto', sans-serif;
 }
 
 .fa-stack-2x {
@@ -30,32 +31,37 @@ ng\:form {
 	color: #FF6600;
 }
 
-
-
-.formTitle {
-	text-align: center;
-	padding-bottom: 10px;
-	margin-top: -25px;
-	color: #ffffff;
-}
-
-	.formTitle > h3 {
-		font-weight: 400;
-		font-family: 'Roboto', sans-serif;
-	}
-
-
-
 .mainFeature {
 	background-color: #FF9900;
-	padding-top: 200px;
-	padding-bottom: 100px;
-	
+	padding-top: 50px;
+    padding-bottom: 25px;
+    border-bottom: 1px solid #FF6600;
+    border-radius: 0px;
+    -webkit-box-shadow: 0px 1px 1px #FF9900;
+    -moz-box-shadow: 0px 1px 1px #FF9900;
+    box-shadow: 0px 1px 1px #FF9900;
+}
+
+.jumbotron {
+    background-color: #ffffff;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 400;
+}
+
+.jumbotron > p {
+    font-size: 17px;
+    font-weight: 300;
+}
+
+.jumboList {
+    list-style: none;
+    font-size: 20px;
+    margin-top: 25px;
 }
 
 .secondFeature {
-	background-color: #ebebeb;
-	padding-top: 100px;
+	/*background-color: #ebebeb;*/
+	padding-top: 50px;
 }
 
 .featureRow {
@@ -67,8 +73,7 @@ ng\:form {
 	margin-top: 0px;
 }
 
-.cogsFeature
-{
+.cogsFeature {
 	font-size: 120px;
 	color: #FF6600;
 	margin-top: 40px;
@@ -100,49 +105,62 @@ ng\:form {
 	font-size: 34px;
 }
 
-.jumbotron {
-	font-family: 'Roboto', sans-serif;
-	font-weight: 400;
-}
-
-	.jumbotron > p {
-		font-size: 17px;
-		font-weight: 300;
-	}
-
-.alert {
-	display: none;
-	margin-top: 30px;
-}
-
-
-
-.modal-header {
-	border-bottom: 1px solid #FF6600;
-}
 .featureText {
     margin-top: 15px;
     font-size: 17px;
 }
 
-.jumboList {
-    list-style: none;
-    font-size: 20px;
-    margin-top: 40px;
+[ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak],
+.ng-cloak, .x-ng-cloak,
+.ng-hide {
+    display: none !important;
 }
 
-.btn-jumbo {
-    margin-top: 35px;
-    font-size: 25px;
-
+ng\:form {
+    display: block;
 }
 
-.jumboHeader {
-    text-align: right;
-    margin-top: 15px;
-}
-
+/*
 .social-login-btn {
     text-align: center;
     margin-top: 40px;
 }
+*/
+
+/*
+.modal-header {
+	border-bottom: 1px solid #FF6600;
+}
+*/
+
+/*
+.alert {
+	display: none;
+	margin-top: 30px;
+}
+*/
+
+/*
+.formTitle {
+	text-align: center;
+	padding-bottom: 10px;
+	margin-top: -25px;
+	color: #ffffff;
+}
+
+	.formTitle > h3 {
+		font-weight: 400;
+		font-family: 'Roboto', sans-serif;
+	}
+*/
+/*
+.colLogin {
+
+	text-align: center;
+}
+*/
+/*
+.navbar-landing {
+	height: 100px;
+}
+*/

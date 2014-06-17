@@ -32,73 +32,40 @@ app.controller('FirebaseCtrl', function($scope, $firebase) {
 });
 */
 
-app.controller('AuthCtrl', function($scope, $rootScope, $firebaseSimpleLogin) {
-    var dataRef = new Firebase('https://codetalking.firebaseio.com');
-    $scope.loginObj = $firebaseSimpleLogin(dataRef);
+app.controller('NavbarCtrl', function($scope, $cookies, $rootScope, $location, $firebaseSimpleLogin) {
 
-    $scope.mainAlert = {
-        isShown: false
-    };
+    console.log("Enter NavbarCtrl, RootScope Auth: "+angular.toJson($rootScope.auth));
 
-    $scope.closeAlert = function () {
-        $scope.mainAlert.isShown = false;
-    }
-
-    function showAlert(alertType, message) {
-        $scope.mainAlert.message = message;
-        $scope.mainAlert.isShown = true;
-        $scope.mainAlert.alertType = alertType;
-    }
-
-
-    $scope.register = function () {
-        $scope.loginObj.$createUser($scope.register.email, $scope.register.password, true) //True - Don't Login after Register ; False - Login after Register
-            .then(function(user) {
-               console.log('User created: '+angular.toJson(user));
-            }, function(error) {
-               console.log('Creation failed: '+angular.toJson(error));
-            });
-    }
-
-});
-
-app.controller('NavbarCtrl', function($scope, $cookies, $cookieStore, $rootScope, $location) {
-	if ($cookies.sessionToken == null) {
-		$scope.isLoggedIn = false;
-	}
-	else {
-		$scope.isLoggedIn = true;
-		$scope.loggedInUser = $cookies.username;
-        angular.element('#nav-public').addClass('hide');
-        angular.element('#nav-private').removeClass('hide');
-	}
-
-	$scope.logout = function () {
-		if ($scope.isLoggedIn == true) {
-            $cookies.username = undefined;
-            $cookies.sessionToken = undefined;
-			$scope.loggedInUser = undefined;
-			$scope.isLoggedIn = false;
-            angular.element('#nav-private').addClass('hide');
-            angular.element('#nav-public').removeClass('hide');            
-            $location.path('/logout').replace();
-		}
-		else {
-			alert('There is no user logged in');
-		}
-        
-        if (user) {
-            $rootScope.fireAuth.logout();
-        }
-	}
-    
-    $scope.goHome = function () {
-        $location.path('/home');
+    $scope.submitAuth = function () {
+        $rootScope.auth.$login('password', {
+            email: $scope.emailAuth,
+            password: $scope.passwordAuth
+        }).then(function(user) {
+            console.log('User Logged In! User: '+angular.toJson(user));
+            console.log("Stuff in Auth RootScope: "+angular.toJson($rootScope.auth));
+            if (!$scope.$$phase) {  //SAFE APPLY TO ANGULAR
+                $scope.$apply();
+            }
+        }, function(error) {
+            if (error.code == 'INVALID_USER') {
+                console.log(error.message+" Trying to sign you up!");
+                console.log("Stuff in RootScope before signup Attempt: "+angular.toJson($rootScope.auth));
+                $rootScope.auth.$createUser($scope.emailAuth, $scope.passwordAuth, false)//False -> Log-in after sign up ; True -> Don't Login after signup
+                    .then(function(user) {
+                        //Add user to firebase and angular
+                        console.log("Stuff in Auth RootScope: "+angular.toJson($rootScope.auth));
+                        $scope.user = user;
+                        console.log("Stuff in User: "+angular.toJson($scope.user));
+                    }, function(error) {
+                        console.log("Error creating user: "+angular.toJson(error));
+                })
+            }
+        })
     }
 });
 //Landing Controller
 app.controller('LandingCtrl', function($scope, $cookies, $location, $cookieStore, $rootScope, userFactory) {
-
+/*
 
 	
     $scope.googleLogin = function() {
@@ -164,6 +131,7 @@ app.controller('LandingCtrl', function($scope, $cookies, $location, $cookieStore
             $('#registerPassword').val('');                    
         });
     }
+    */
 });
 
 //Home Controller

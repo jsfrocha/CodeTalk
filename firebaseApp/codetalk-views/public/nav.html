@@ -1,18 +1,25 @@
-	<nav class="navbar navbar-default navbar-fixed-top navbar-landing" role="navigation" ng-controller="NavbarCtrl">
-	  	<div class="container">
-	  		<div class="navbar-header">
-	  			<a class="navbar-brand" href="/">
-	  			<span class="fa-stack fa-lg">
-		  			<i class="fa fa-comment fa-stack-2x"></i>
-		  			<i class="fa fa-cogs fa-stack-1x"></i>
-	  			</span>
-	  			<div id="brandTitle">CodeTalk</div>
-	  			</a>
-	  		</div>
-	  		<ul class="nav navbar-nav navbar-right">
-	  			<li class="menuItem"><a href="#">Home</a></li>
-	  			<li class="menuItem"><a href="#about">About</a></li>
-	  			<li class="menuItem"><a href="#contact">Contact</a></li>
-	  		</ul>
-	  	</div>
-  	</nav>
+<nav class="navbar navbar-default" role="navigation" ng-controller="NavbarCtrl">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-collapse-public">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="#">
+            <span class="fa-stack navbar-logo">
+                <i class="fa fa-comment fa-stack-2x"></i>
+                <i class="fa fa-cogs fa-stack-1x"></i>
+            </span>
+            <h3 class="navbar-brand-codetalk">Codetalk</h3></a>
+    </div>
+    <div class="collapse navbar-collapse" id="navbar-collapse-public">
+        <form class="navbar-form navbar-right" ng-submit="submitAuth()">
+            <div class="form-group">
+                <input type="email" class="form-control" placeholder="E-mail" ng-model="emailAuth">
+                <input type="password" class="form-control" placeholder="Password" ng-model="passwordAuth">
+            </div>
+            <button type="submit" class="btn btn-default">Sign-up / Sign-in</button>
+        </form>
+    </div>
+</nav>

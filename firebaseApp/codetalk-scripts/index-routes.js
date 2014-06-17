@@ -9,43 +9,30 @@ app.config(function($routeProvider, $locationProvider) {
 	 	templateUrl: 'codetalk-views/public/landing.html',
 	 	controller: 'LandingCtrl'
 	 })
-    
-    .when('/logout', {
-        templateUrl: 'codetalk-views/public/landing.html',
-        controller: 'LandingCtrl'
-    })
-    
-	.when('/contact', {
-		templateUrl: 'codetalk-views/public/contact.html',
-		controller: 'ContactCtrl'
-	})
 
-    .when('/about', {
-        templateUrl: 'codetalk-views/public/about.html',
-        controller: 'AboutCtrl'
-    })
     .when('/home', {
         templateUrl: 'codetalk-views/private/home.html',
         controller: 'HomeCtrl'
     })
     .when('/start', {
-        templateUrl: 'codetalk-views/private/start.html',
-        controller: 'StartCtrl'
+        templateUrl: 'codetalk-views/private/groups.html',
+        controller: 'GroupsCtrl'
     })
-    .when('/firebase', {
-        templateUrl: 'codetalk-views/private/firebase.html',
-        controller: 'FirebaseCtrl'
-    })
+
 	.otherwise( {
 		redirectTo: '/notfound',
         templateUrl: 'codetalk-views/notfound.html'
 	}); 
 }).
 
-run(function($rootScope, $location, $cookies) {
+run(function($rootScope, $location, $firebaseSimpleLogin) {
+    //Initialize Firebase Auth
+    var dataRef = new Firebase('https://codetalking.firebaseio.com');
+    $rootScope.auth = $firebaseSimpleLogin(dataRef);
+
     //Register Listener to watch route changes
     $rootScope.$on( "$routeChangeStart", function(event, next, current) {
-        if ($cookies.sessionToken == null || $cookies.sessionToken == undefined) {
+        if ($rootScope.auth.user == null || $rootScope.auth.user == undefined) {
             //No Logged in user, we should go to Login page
             if (next.templateUrl == "codetalk-views/public/landing.html" ||
                 next.templateUrl == "codetalk-views/public/about.html" ||
