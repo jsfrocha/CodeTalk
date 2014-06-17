@@ -49,7 +49,7 @@
 	</div>
 
 
-
+<!-- Login / Register Modal -->
 <div class="modal fade getStartedModal" tabindex="-1" role="dialog" aria-labelledby="getStartedModal" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
@@ -60,10 +60,11 @@
       <div class="modal-body">
 	      <div class="row">
 	      	<div class="col-xs-5">
-		      	<div class="text-center">
-		      		<h4>Register</h4>
-		      	</div>
-	          <form role="form" ng-controller="AuthCtrl">
+                <div class="text-center">
+                    <h4>Register</h4>
+                </div>
+                <!-- Register Form -->
+                <form role="form" ng-submit="register()" ng-controller="AuthCtrl">
                   <div class="form-group">
                       <label for="registerEmail">E-mail</label>
                       <input type="email" class="form-control" id="registerEmail" ng-model="register.email">
@@ -71,15 +72,18 @@
                   <div class="form-group">
                       <label for="registerPassword">Password</label>
                       <input type="password" class="form-control" id="registerPassword" ng-model="register.password">
-	              </div>
+                  </div>
                   <div class="form-group">
                     <div class="text-center">
-                        <button type="submit" class="btn btn-default" ng-click="signUp()">Submit</button>
+                        <button type="submit" class="btn btn-default">Submit</button>
                     </div>
                   </div>
-			    <div class="alert alert-danger alert-register-error"></div>	        
-			    <div class="alert alert-success alert-register-success"></div>	        
-	          </form>			      	
+                  <!-- Bootstrap Alert - MainAlert Angular -->
+                  <div class="alert {{mainAlert.alertType}}" ng-show="mainAlert.isShown">
+                      <button type="button" class="close" ng-click="closeAlert()" aria-hidden="true">&times;</button>
+                      {{mainAlert.message}}
+                  </div>
+                </form>
 	      	</div>
 	      	<div class="col-xs-2 text-center">
 	      		<img src="codetalk-img/PopUp_Login_OR.png" />
@@ -88,7 +92,8 @@
 		      	<div class="text-center">
 		      		<h4>Login</h4>
 		      	</div>
-				<form role="form" ng-submit="loginSubmit()">
+                <!-- Login Form -->
+				<form role="form" ng-submit="loginSubmit()" ng-controller="AuthCtrl">
 				    <div class="form-group">
 				      <label for="loginUsername">Username</label>
 				      <input type="name" class="form-control" id="loginUsername" ng-model="login.name">

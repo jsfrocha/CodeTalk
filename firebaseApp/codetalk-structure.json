@@ -1,24 +1,42 @@
-{
-    "users": {
-        "user1": {
-            "ID": "fakeID",
-            "Email": "fakeEmail",
-            "notes": {
-                "note1": {
-                    "title": "fakeTitle",
-                    "description": "fakeDescription",
-                    "noteCode": {
-                        "code": "fakeCode",
-                        "mode": "fakeMode"
-                    }
-                }
-            }
-        }
-    }
-    
-    "groups": {
-        "group1": {
-            
-        }
-    }
+{	
+	"groups" : {
+		"groupID": "",
+			"name": "",
+			"rels": {
+				"users": {
+					"userID":""
+				}
+			},
+			"isPrivate": true 
+	},
+
+	"users": {
+		"userID": "",
+			"email": "",
+			"rels": {
+				"notes": {
+					"noteID":""
+				}
+			},
+			"friends": {
+				"userID": ""
+			}
+	},
+
+	"notes": {
+		"noteID": "",
+			"title": "",
+			"description": "",
+			"rels": {
+				"files": {
+					"fileID": ""
+				}
+			}
+	},
+
+	"files": {
+		"fileID": "",
+			"mode": "",
+			"url": ""
+	}
 }

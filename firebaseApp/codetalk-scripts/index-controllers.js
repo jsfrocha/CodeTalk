@@ -1,3 +1,4 @@
+/*
 app.controller('FirebaseCtrl', function($scope, $firebase) {
 
     //Initialize Firebase Authentication
@@ -28,6 +29,37 @@ app.controller('FirebaseCtrl', function($scope, $firebase) {
     $scope.removeMessage = function (id) {
         $scope.messages.$remove(id);        
     }
+});
+*/
+
+app.controller('AuthCtrl', function($scope, $rootScope, $firebaseSimpleLogin) {
+    var dataRef = new Firebase('https://codetalking.firebaseio.com');
+    $scope.loginObj = $firebaseSimpleLogin(dataRef);
+
+    $scope.mainAlert = {
+        isShown: false
+    };
+
+    $scope.closeAlert = function () {
+        $scope.mainAlert.isShown = false;
+    }
+
+    function showAlert(alertType, message) {
+        $scope.mainAlert.message = message;
+        $scope.mainAlert.isShown = true;
+        $scope.mainAlert.alertType = alertType;
+    }
+
+
+    $scope.register = function () {
+        $scope.loginObj.$createUser($scope.register.email, $scope.register.password, true) //True - Don't Login after Register ; False - Login after Register
+            .then(function(user) {
+               console.log('User created: '+angular.toJson(user));
+            }, function(error) {
+               console.log('Creation failed: '+angular.toJson(error));
+            });
+    }
+
 });
 
 app.controller('NavbarCtrl', function($scope, $cookies, $cookieStore, $rootScope, $location) {

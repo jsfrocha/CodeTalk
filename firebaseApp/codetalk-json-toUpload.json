@@ -1,0 +1,38 @@
+{	
+	"groups" : {
+		"name": "",
+		"rels": {
+			"users": {
+
+			}
+		},
+		"isPrivate": true 
+	},
+
+	"users": {
+		"email": "",
+		"rels": {
+			"notes": {
+
+			}
+		},
+		"friends": {
+
+		}
+	},
+
+	"notes": {
+		"title": "",
+		"description": "",
+		"rels": {
+			"files": {
+
+			}
+		}
+	},
+
+	"files": {
+		"mode": "",
+		"url": ""
+	}
+}
