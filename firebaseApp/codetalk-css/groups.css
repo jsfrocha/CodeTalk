@@ -13,6 +13,10 @@
     padding-bottom: 10px;
 }
 
+.alert-groups {
+    font-size: 15px;
+}
+
 .groupsPanel {
     margin-top: 25px;
     font-size: 24px;
@@ -41,5 +45,9 @@
 
 .groupsForm > .form-group > input {
     width: 453px;
+}
+
+.groupItem:hover {
+    cursor: pointer;
 }
 

@@ -55,8 +55,9 @@ app.controller('NavbarCtrl', function($scope, $rootScope, $firebase) {
                     .then(function(user) {
                         //Add user to firebase and angular
                         console.log("Stuff in Auth RootScope: "+angular.toJson($rootScope.auth));
-                        $scope.user = user; //Not sure if needed
+                        //$scope.user = user; //Not sure if needed
                         usersRef.$add({
+                            id: user.id,
                             email: user.email
                         });
                         console.log("Stuff in User: "+angular.toJson($scope.user));
@@ -83,6 +84,10 @@ app.controller('GroupsCtrl', function($scope, $rootScope, $firebase) {
         isShown: false
     };
 
+//    angular.forEach($scope.groups, function(value, key) {
+//        console.log("Key: "+key+" Value: "+value);
+//    });
+
     function showAlert(alertType, message) {
         $scope.groupsAlert.message = message;
         $scope.groupsAlert.isShown = true;
@@ -93,19 +98,24 @@ app.controller('GroupsCtrl', function($scope, $rootScope, $firebase) {
         $scope.groupsAlert.isShown = false;
     }
 
-
     $scope.createGroup = function () {
         //Create Firebase 'Group' in 'groups' with Name Entered
-
-        $scope.groups.$add({
-            name: $scope.newGroupName,
-            isPrivate: true //Set group.isPrivate to 'true'
-        })
-            .then(function(ref) { //TODO: Add Current user inside the newly created group - WIP
-                var groupRef = $firebase(new Firebase("https://codetalking.firebaseio.com/groups/"+ref.name()));
-
-            });
-
+        if ($scope.groups[$scope.newGroupName]) { //DUPLICATES: If true -> Name entered doesn't exist; If false -> Name already exists
+            $scope.groups.$add({
+                name: $scope.newGroupName,
+                isPrivate: true //Set group.isPrivate to 'true'
+            })
+                .then(function (ref) { //Add Current user inside the newly created group
+                    var groupRef = $firebase(new Firebase("https://codetalking.firebaseio.com/groups/" + ref.name() + "/rels/users"));
+                    groupRef.$add({
+                        id: $rootScope.auth.user.id,
+                        email: $rootScope.auth.user.email
+                    })
+                });
+        } else {
+            console.log("Duplicate found with name: "+$scope.newGroupName);
+            showAlert("alert-danger", "There is already a group named '"+$scope.newGroupName+"'.");
+        }
         angular.element('#new-groupname-input').val('');
     }
 
