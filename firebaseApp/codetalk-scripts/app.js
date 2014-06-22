@@ -27,7 +27,7 @@ app.config(function($routeProvider, $locationProvider) {
             controller: 'AboutCtrl'
         })
         .when('/home', {
-            templateUrl: 'codetalk-views/private/home.html',
+            templateUrl: 'codetalk-views/private/groupitem.html',
             controller: 'HomeCtrl'
         })
         .when('/start', {

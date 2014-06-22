@@ -1,38 +1,8 @@
-/*
-app.controller('FirebaseCtrl', function($scope, $firebase) {
+app.controller('LandingCtrl', function($scope) {
 
-    //Initialize Firebase Authentication
-    var fire = new Firebase('https://codetalking.firebaseio.com');
-    var fireAuth = new FirebaseSimpleLogin(fire, function(error, user) {
-        if (error) {
-            //Error during login
-            console.log(error);
-        } else if (user) {
-            //User authenticated with Firebase
-            console.log("User Var Log");
-            console.log("User ID: " + user.uid + ", Provider: " + user.provider + ", Email: " + user.email);
-            console.log("Auth Var Log");
-            console.log("Email: " + fireAuth.email + ", ID: " + fireAuth.id + ", Provider: " + fireAuth.provider + ", UID: " + fireAuth.uid);
-        }
-        else {
-            //user is logged out
-        }
-    });
-    
-    $scope.messages = $firebase(fire);
-    $scope.addMessage = function(e) {
-        if (e.keyCode != 13) return;
-        $scope.messages.$add({from: $scope.name, body: $scope.msg});        
-        $scope.msg = "";
-    }
-    
-    $scope.removeMessage = function (id) {
-        $scope.messages.$remove(id);        
-    }
 });
-*/
 
-app.controller('NavbarCtrl', function($scope, $rootScope, $firebase) {
+app.controller('NavbarCtrl', function($scope, $rootScope, $firebase, $location) {
     var usersRef = $firebase(new Firebase("https://codetalking.firebaseio.com/users"));
 
     console.log("Enter NavbarCtrl, RootScope Auth: "+angular.toJson($rootScope.auth));
@@ -42,33 +12,50 @@ app.controller('NavbarCtrl', function($scope, $rootScope, $firebase) {
             email: $scope.emailAuth,
             password: $scope.passwordAuth
         }).then(function(user) {
-            console.log('User Logged In! User: '+angular.toJson(user));
-            console.log("Stuff in Auth RootScope: "+angular.toJson($rootScope.auth));
             if (!$scope.$$phase) {  //SAFE APPLY TO ANGULAR
                 $scope.$apply();
             }
+            $scope.emailAuth = '';
+            $scope.passwordAuth = '';
+            $location.path('/start');
         }, function(error) {
             if (error.code == 'INVALID_USER') {
                 console.log(error.message+" Trying to sign you up!");
                 console.log("Stuff in RootScope before signup Attempt: "+angular.toJson($rootScope.auth));
                 $rootScope.auth.$createUser($scope.emailAuth, $scope.passwordAuth, false)//False -> Log-in after sign up ; True -> Don't Login after signup
                     .then(function(user) {
+                        console.log("Stuff in User: "+angular.toJson(user));
+                        console.log("Stuff in rootScope: "+$rootScope.auth);
+                        $rootScope.auth.user = user;
+                        console.log("Stuff in rootScope User: "+$rootScope.auth.user);
                         //Add user to firebase and angular
-                        console.log("Stuff in Auth RootScope: "+angular.toJson($rootScope.auth));
                         //$scope.user = user; //Not sure if needed
+                        if (!$scope.$$phase) {  //SAFE APPLY TO ANGULAR
+                            $scope.$apply();
+                        }
                         usersRef.$add({
                             id: user.id,
                             email: user.email
                         });
-                        console.log("Stuff in User: "+angular.toJson($scope.user));
+                        console.log("Stuff in Auth: "+angular.toJson($rootScope.auth));
                         if (!$scope.$$phase) {  //SAFE APPLY TO ANGULAR
                             $scope.$apply();
                         }
+                        $scope.emailAuth = '';
+                        $scope.passwordAuth = '';
+                        $location.path('/start');
                     }, function(error) {
                         console.log("Error creating user: "+angular.toJson(error));
                 })
             }
         })
+    }
+
+    $scope.logout = function () {
+        $rootScope.auth.$logout();
+        $rootScope.auth.user = null;
+        console.log("Logout Auth: "+$rootScope.auth.user);
+        $location.path('/');
     }
 });
 
@@ -121,76 +108,10 @@ app.controller('GroupsCtrl', function($scope, $rootScope, $firebase) {
 
 });
 
-//Landing Controller
-app.controller('LandingCtrl', function($scope, $cookies, $location, $cookieStore, $rootScope, userFactory) {
-/*
-
-	
-    $scope.googleLogin = function() {
-        fireAuth.login('google');
-    };
-    
-	$scope.loginSubmit = function() {
-		var user = $scope.login;
-		userFactory.doLogin(user.name, user.pass)
-		.success(function(data) {
-			$cookies.sessionToken = data.sessionToken;
-			$cookies.username = data.username;
-     
-            $scope.isLoggedIn = true;
-            //alert(JSON.stringify(data)); Debug
-			$('#loginUsername').val('');
-			$('#loginPassword').val('');
-            $('.getStartedModal').modal('hide');
-            $('#nav-public').addClass('hide');
-            $('#nav-private').removeClass('hide');
-            $('.modal-backdrop').addClass('hide');
-            $location.path('/home');
-            $location.replace();
-		})
-		.error(function(data) {
-			var error = data.error;
-			var showError = error.charAt(0).toUpperCase() + error.slice(1);
-            $('.alert-login')
-                .empty()
-			    .append('<p>'+showError+'</p>')
-			    .show();
-            $('#loginUsername').val('');
-            $('#loginPassword').val('');                    
-		}); 
-	};
-
-    $scope.registerSubmit = function() {
-        var user = $scope.register;
-        userFactory.doRegister(user.name, user.pass, user.email)
-        .success(function(data) {
-            var showSuccess = "You are now registered !"
-            $('.alert-register-error')
-                .empty()
-                .hide();
-            $('.alert-register-success')
-                .empty()
-                .append('<p>'+showSuccess+'</p>')
-                .show();
-            $('#registerEmail').val('');
-            $('#registerUsername').val('');
-            $('#registerPassword').val(''); 
-        })
-        .error(function(data) {
-            var error = data.error;
-            var showError = error.charAt(0).toUpperCase() + error.slice(1);
-            $('.alert-register-success').empty().hide();
-            $('.alert-register-error')
-                .empty()
-                .append('<p>'+showError+'</p>')
-                .show();
-            $('#registerEmail').val('');
-            $('#registerUsername').val('');
-            $('#registerPassword').val('');                    
-        });
-    }
-    */
+app.controller('SingleGroupCtrl', function($scope, $routeParams, $firebase) {
+   $scope.currentGroup = $routeParams.groupId;
 });
+
 
 //Home Controller
 app.controller('HomeCtrl', function($scope, parseObjFactory, userFactory) {
@@ -349,8 +270,4 @@ app.controller('HomeCtrl', function($scope, parseObjFactory, userFactory) {
         parseObjFactory.setRelation('12objClass', '12objId', '12relColumn0', '12relChild', '12childId');
     }
     
-});
-
-app.controller('NavPubCtrl', function($scope) {
-    $scope.state = "Public";
 });
