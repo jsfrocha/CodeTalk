@@ -10,7 +10,8 @@ app.controller('NavbarCtrl', function($scope, $rootScope, $firebase, $location) 
     $scope.submitAuth = function () {
         $rootScope.auth.$login('password', {
             email: $scope.emailAuth,
-            password: $scope.passwordAuth
+            password: $scope.passwordAuth,
+            debug: true //TODO: Remove this (debug only)
         }).then(function(user) {
             if (!$scope.$$phase) {  //SAFE APPLY TO ANGULAR
                 $scope.$apply();
@@ -65,15 +66,33 @@ app.controller('GroupsCtrl', function($scope, $rootScope, $firebase) {
 
     $scope.groups = groupsRef;
 
+    $scope.userGroups = [];
+
+    //When GROUPS are loaded, add those that belong to user OR are public to USERGROUPS, and display that.
+    //TODO: $on 'loaded' only triggers once, it does not trigger with new data input
+//    $scope.groups.$on('loaded', function() {
+//        $scope.groups.$getIndex().forEach(function(value, key) {
+//            if ($scope.groups[value].rels.users[$rootScope.auth.user.uid] || !$scope.groups[value].isPrivate) {
+//                $scope.userGroups.push($scope.groups[value]);
+//            }
+//        });
+//    });
+//
+//    $scope.groups.$on('child_added', function() {
+//        $scope.groups.$getIndex().forEach(function(value, key) {
+//            if ($scope.groups[value].rels.users[$rootScope.auth.user.uid] || !$scope.groups[value].isPrivate) {
+//                $scope.userGroups.push($scope.groups[value]);
+//            }
+//        });
+//    });
+
+
     $scope.groupsAlert = {
         alertType: "",
         message: "",
         isShown: false
     };
 
-//    angular.forEach($scope.groups, function(value, key) {
-//        console.log("Key: "+key+" Value: "+value);
-//    });
 
     function showAlert(alertType, message) {
         $scope.groupsAlert.message = message;
@@ -87,17 +106,17 @@ app.controller('GroupsCtrl', function($scope, $rootScope, $firebase) {
 
     $scope.createGroup = function () {
         //Create Firebase 'Group' in 'groups' with Name Entered
-        if ($scope.groups[$scope.newGroupName]) { //DUPLICATES: If true -> Name entered doesn't exist; If false -> Name already exists
+        if (!$scope.groups[$scope.newGroupName]) { //DUPLICATES: If true -> Name entered doesn't exist; If false -> Name already exists
             $scope.groups.$add({
                 name: $scope.newGroupName,
                 isPrivate: true //Set group.isPrivate to 'true'
             })
                 .then(function (ref) { //Add Current user inside the newly created group
-                    var groupRef = $firebase(new Firebase("https://codetalking.firebaseio.com/groups/" + ref.name() + "/rels/users"));
+                    var groupRef = $firebase(new Firebase("https://codetalking.firebaseio.com/groups/" + ref.name() + "/rels/users/"+$rootScope.auth.user.uid));
                     groupRef.$add({
                         id: $rootScope.auth.user.id,
                         email: $rootScope.auth.user.email
-                    })
+                    });
                 });
         } else {
             console.log("Duplicate found with name: "+$scope.newGroupName);

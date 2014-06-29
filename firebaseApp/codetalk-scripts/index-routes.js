@@ -53,7 +53,7 @@ run(function($rootScope, $location, $firebaseSimpleLogin) {
     //Register Listener to watch route changes
     $rootScope.$on("$routeChangeStart", function (event, next, current) {
         console.log("RouteChangeStart");
-        console.log("AuthUser: "+$rootScope.auth.user);
+        console.log("AuthUser: "+angular.toJson($rootScope.auth.user));
         if ($rootScope.auth.user == null || $rootScope.auth.user == undefined) {
             //No Logged in user, we should go to Login page
             if (next.templateUrl == "codetalk-views/public/landing.html"
