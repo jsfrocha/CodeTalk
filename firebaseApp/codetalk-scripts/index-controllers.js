@@ -96,14 +96,11 @@ app.controller('GroupsCtrl', function($scope, $rootScope, $firebase) {
     $scope.createGroup = function () {
 
         var currentUserGroupRef = $rootScope.getFBRef('users/'+$rootScope.auth.user.uid+'/allowedGroups');
-        var groupsRef = $rootScope.getFBRef('groups');
-
-        var existingGroups = groupsRef.$getIndex();
 
         var newGroupName = $scope.newGroupName;
         var selectedMode = $scope.selectedMode;
 
-        //TODO: Check for duplicate group names needs to be done on .write / .validate rules
+        //TODO: Check for duplicate group names needs to be done on .write / .validate rules - DONE
 //        groupsRef.$on('loaded', function() {
 //           var existingGroups = groupsRef.$getIndex();
 //           existingGroups.forEach(function(key, i) {
