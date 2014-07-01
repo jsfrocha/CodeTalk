@@ -24,6 +24,15 @@
     padding-right: 70px;
 }
 
+.modeSelector {
+    margin-bottom: 12px;
+}
+
+.modeSelector > label {
+    font-size: 14px;
+    font-weight: 700;
+}
+
 .groupsPanel > .nav-pills > li {
     background-color: #FF6800;
     opacity: 0.7;

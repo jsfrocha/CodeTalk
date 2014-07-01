@@ -34,7 +34,7 @@ app.config(function($routeProvider) {
 
 }).
 
-run(function($rootScope, $location, $firebaseSimpleLogin) {
+run(function($rootScope, $location, $firebaseSimpleLogin, $firebase) {
     var dataRef = new Firebase('https://codetalking.firebaseio.com');
     $rootScope.auth = $firebaseSimpleLogin(dataRef);
 
@@ -71,7 +71,9 @@ run(function($rootScope, $location, $firebaseSimpleLogin) {
 
     });
 
-
+    $rootScope.getFBRef = function (urlAdded) {
+        return $firebase(new Firebase('https://codetalking.firebaseio.com/'+urlAdded));
+    }
 
     
 

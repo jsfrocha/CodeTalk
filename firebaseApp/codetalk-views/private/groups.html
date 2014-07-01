@@ -9,6 +9,13 @@
                     <button type="button" class="close" data-dismiss="alert" aria-hidden="true" ng-click="closeAlert()">&times;</button>
                     {{groupsAlert.message}}
                 </div>
+                <button class="btn btn-default" ng-click="testFunction()">Test Button</button>
+                <div class="form-group modeSelector">
+                    <label for="modeSelector">Choose the Mode:</label>
+                    <select id="modeSelector" class="form-control" data-ng-model="selectedMode" required>
+                        <option ng-repeat="aceMode in aceModes" value="{{aceMode.mode}}">{{aceMode.name}}</option>
+                    </select>
+                </div>
                 <form class="form-inline groupsForm" ng-submit="createGroup()">
                     <div class="form-group">
                         <input type="text" class="form-control" placeholder="Group Name" ng-model="newGroupName" id="new-groupname-input">
@@ -16,7 +23,7 @@
                     </div>
                 </form>
                 <ul class="nav nav-pills nav-stacked">
-                    <li ng-repeat="group in groups"><a class="groupItem">{{group.name}}</a></li>
+                    <li ng-repeat="group in groups"><a class="groupItem"><span>{{group.name}}</span><span class="pull-right">{{group.mode}}</span></a></li>
                 </ul>
             </div>
         </div>
