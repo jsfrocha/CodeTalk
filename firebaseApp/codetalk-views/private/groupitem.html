@@ -1,7 +1,14 @@
-<div class="container ct-home-main" ng-controller="SingleGroupCtrl">
+<div class="container mainGroupItemSection" ng-controller="SingleGroupCtrl">
     <div class="row">
-        <div class="col-md-6">
-            <div class="ct-inner-title">
+        <div class="col-sm-12">
+            <div class="ct-header-title">
+                {{currentGroup}}
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ct-column-title">
                 Code
             </div>
             <div id="editor-actions">
@@ -14,8 +21,8 @@
             </div>
             <div id="code-editor" ng-show="hasCode"></div>
         </div>
-        <div class="col-md-6">
-            <div class="ct-inner-title">
+        <div class="navmenu navmenu-default navmenu-fixed-right offcanvas">
+            <div class="ct-column-title">
                 Talk
             </div>
             <div class="note-block active">

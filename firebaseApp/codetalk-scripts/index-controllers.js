@@ -95,32 +95,32 @@ app.controller('GroupsCtrl', function($scope, $rootScope, $firebase) {
 
     $scope.createGroup = function () {
 
+        var suggestName = function (name) {
+            return name.replace(/[^a-z0-9]/gi, '');
+        };
+
+        var isNameValid = function (name) {
+            var regex = /[^a-z0-9]/ig;
+            if (name.match(regex)) return false;
+            else return true;
+        }
+
         var currentUserGroupRef = $rootScope.getFBRef('users/'+$rootScope.auth.user.uid+'/allowedGroups');
 
         var newGroupName = $scope.newGroupName;
         var selectedMode = $scope.selectedMode;
 
-        //TODO: Check for duplicate group names needs to be done on .write / .validate rules - DONE
-//        groupsRef.$on('loaded', function() {
-//           var existingGroups = groupsRef.$getIndex();
-//           existingGroups.forEach(function(key, i) {
-//              if (existingGroups[i] == newGroupName) {
-//                  showAlert('alert-danger', 'Group name already exists');
-//                  return false;
-//              }
-//           });
-//        });
 
-
-            //Add
-            if (!!$scope.newGroupName) {
-                if ($scope.selectedMode != "NONE") { //Happy path
+        //Add
+        if (!!$scope.newGroupName) {
+            if ($scope.selectedMode != "NONE") { //Happy path
+                if (isNameValid($scope.newGroupName)) {
                     currentUserGroupRef.$add({
                         name: newGroupName,
                         mode: selectedMode
                     })
-                        .then(function(ref) {
-                            var groupRef = $rootScope.getFBRef('groups/'+$scope.newGroupName);
+                        .then(function (ref) {
+                            var groupRef = $rootScope.getFBRef('groups/' + $scope.newGroupName);
                             groupRef.$set({
                                 mode: selectedMode,
                                 isPrivate: true
@@ -128,57 +128,19 @@ app.controller('GroupsCtrl', function($scope, $rootScope, $firebase) {
                         });
                     angular.element('#new-groupname-input').val('');
                 }
-                else { //No Selected Mode
-                    showAlert('alert-danger', 'Please select a mode for the group');
+                else {//Invalid Characters
+                    showAlert('alert-danger', "Invalid characters, try: '"+suggestName($scope.newGroupName)+"'");
                 }
             }
-            else { //New Group Name is Empty
-                showAlert('alert-danger', 'Please insert a name for the group');
+            else { //No Selected Mode
+                showAlert('alert-danger', 'Please select a mode for the group');
             }
-
-
-
-
-
-//        //Create Firebase 'Group' in 'groups' with Name Entered
-//        if (!$scope.groups[$scope.newGroupName]) { //DUPLICATES: If true -> Name entered doesn't exist; If false -> Name already exists
-//            $scope.groups.$add({
-//                name: $scope.newGroupName,
-//                isPrivate: true //Set group.isPrivate to 'true'
-//            })
-//                .then(function (ref) { //Add Current user inside the newly created group
-//                    var groupRef = $firebase(new Firebase("https://codetalking.firebaseio.com/groups/" + ref.name() + "/rels/users/"+$rootScope.auth.user.uid));
-//                    groupRef.$add({
-//                        id: $rootScope.auth.user.id,
-//                        email: $rootScope.auth.user.email
-//                    });
-//                });
-//        } else {
-//            console.log("Duplicate found with name: "+$scope.newGroupName);
-//            showAlert("alert-danger", "There is already a group named '"+$scope.newGroupName+"'.");
-//        }
-
+        }
+        else { //New Group Name is Empty
+            showAlert('alert-danger', 'Please insert a name for the group');
+        }
     }
 
-
-
-    //When GROUPS are loaded, add those that belong to user OR are public to USERGROUPS, and display that.
-    //TODO: $on 'loaded' only triggers once, it does not trigger with new data input
-//    $scope.groups.$on('loaded', function() {
-//        $scope.groups.$getIndex().forEach(function(value, key) {
-//            if ($scope.groups[value].rels.users[$rootScope.auth.user.uid] || !$scope.groups[value].isPrivate) {
-//                $scope.userGroups.push($scope.groups[value]);
-//            }
-//        });
-//    });
-//
-//    $scope.groups.$on('child_added', function() {
-//        $scope.groups.$getIndex().forEach(function(value, key) {
-//            if ($scope.groups[value].rels.users[$rootScope.auth.user.uid] || !$scope.groups[value].isPrivate) {
-//                $scope.userGroups.push($scope.groups[value]);
-//            }
-//        });
-//    });
 
 
     $scope.groupsAlert = {
@@ -196,13 +158,17 @@ app.controller('GroupsCtrl', function($scope, $rootScope, $firebase) {
 
     $scope.closeAlert = function () {
         $scope.groupsAlert.isShown = false;
+        if (!$scope.$$phase) {  //SAFE APPLY TO ANGULAR
+            $scope.$apply();
+        }
     }
 
 
 });
 
 app.controller('SingleGroupCtrl', function($scope, $routeParams, $firebase) {
-   $scope.currentGroup = $routeParams.groupId;
+   $scope.currentGroup = $routeParams.groupName;
+
 });
 
 

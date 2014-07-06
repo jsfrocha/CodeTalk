@@ -20,7 +20,7 @@ app.config(function($routeProvider) {
         controller: 'GroupsCtrl'
     })
 
-    .when('/start/:groupId', {
+    .when('/start/:groupName', {
         templateUrl: 'codetalk-views/private/groupitem.html',
         controller: 'SingleGroupCtrl'
     })
@@ -65,8 +65,13 @@ run(function($rootScope, $location, $firebaseSimpleLogin, $firebase) {
             }
         }
         else {
-            console.log("User Authenticated: "+$rootScope.auth.user.email);
-            $location.path('/start');
+            if (current.templateUrl == "codetalk-views/private/groups.html") {
+
+            } else {
+                $location.path('/start');
+            }
+
+
         }
 
     });
