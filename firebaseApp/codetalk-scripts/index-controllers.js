@@ -70,21 +70,6 @@ app.controller('GroupsCtrl', function($scope, $rootScope, $firebase) {
     $scope.selectedMode = "NONE";
     $scope.aceModes = aceModesRef;
 
-//    $scope.testFunction = function () {
-//        console.log("Test Function - IN");
-//        $scope.groupsRef = $rootScope.getFBRef('groups');
-//        $scope.groupsRef.$on('loaded', function () {
-//            var existingGroups = $scope.groupsRef.$getIndex();
-//            var newGroupName = $scope.newGroupName;
-//            existingGroups.forEach(function(key, i) {
-//                if (existingGroups[i] == newGroupName) {
-//                    showAlert('alert-danger', 'Group name already exists');
-//                    return false;
-//                }
-//            });
-//        });
-//    }
-
     $scope.createGroup = function () {
         var suggestName = function (name) {
             return name.replace(/[^a-z0-9]/gi, '');
@@ -151,24 +136,122 @@ app.controller('GroupsCtrl', function($scope, $rootScope, $firebase) {
 
 app.controller('SingleGroupCtrl', function($scope, $rootScope, $routeParams, $firebase) {
     $scope.currentGroup = $routeParams.groupName;
-    var editor = ace.edit("code-editor");
-    editor.setTheme("ace/theme/github");
+
+    $scope.editor = ace.edit("code-editor");
+    $scope.editor.setTheme("ace/theme/github");
+
+    $scope.modalEditor = ace.edit("modal-code-editor");
+    $scope.modalEditor.setTheme("ace/theme/github");
+    $scope.modalEditor.setReadOnly(true);
+
 
     var groupsRef = $rootScope.getNormalFBRef('groups');
-
     groupsRef.once('value', function(snap) {
         snap.forEach(function(child) {
             if (child.name() == $scope.currentGroup) {
-                editor.getSession().setMode("ace/mode/"+child.val().mode);
+                $scope.groupMode = child.val().mode;
+                $scope.editor.getSession().setMode("ace/mode/"+$scope.groupMode);
+                $scope.modalEditor.getSession().setMode("ace/mode/"+$scope.groupMode);
             }
         });
     });
 
+    $scope.notes = $rootScope.getFBRef('notes');
+
+    $scope.editor.on('blur', function() {
+       $scope.modalEditor.getSession().setValue($scope.editor.session.getTextRange($scope.editor.getSelectionRange()));
+    });
+});
+
+app.controller('AddNoteCtrl', function($scope, $rootScope) {
+
+    $scope.newNote = {};
+
+
+
     $scope.addNote = function () {
+        console.log("addnote in");
 
+        $scope.modalEditor.setValue($scope.codeContent);
+
+        if (typeof $scope.newNote != undefined && $scope.newNote.noteTitle && $scope.newNote.noteContent) {
+
+            var title = $scope.newNote.noteTitle;
+            var content = $scope.newNote.noteContent;
+            var code = $scope.editor.session.getTextRange($scope.editor.getSelectionRange());
+
+            var currentNoteRef = $rootScope.getFBRef('notes/'+$scope.currentGroup+'_'+title);
+            var notesRef = $rootScope.getNormalFBRef('notes');
+
+            var existingNotesArray = new Array();
+
+            notesRef.once('value', function(snap) {
+                snap.forEach(function(child) {
+                    existingNotesArray.push(child.name());
+                });
+            });
+            var existingNotes = new Array();
+            for (var i = 0; i < existingNotesArray.length; i++) {
+                if (existingNotesArray[i].split('_')[0] == $scope.currentGroup)
+                    existingNotes.push(existingNotesArray[i].split('_')[1]);
+            }
+
+            if (existingNotes.indexOf(title) == -1) {
+                currentNoteRef.$set({
+                    content: content,
+                    code: code
+                });
+
+                $scope.newNote.noteTitle = "";
+                $scope.newNote.noteContent = "";
+                $scope.modalEditor.getSession().setValue('');
+                angular.element('#addNoteModal').modal('hide');
+            }
+            else {
+                showAlert('alert-danger', 'Note "'+title+'" already exists in this group');
+            }
+
+            console.log("Note\n");
+            console.log("Title: "+title+"\n");
+            console.log("Content: "+content+"\n");
+            console.log("Code: "+code+"\n");
+
+
+        }
+        else {
+            showAlert('alert-danger', 'Both fields are mandatory');
+        }
     };
 
-    $scope.addSelection = function () {
-
+    $scope.groupsAlert = {
+        alertType: "",
+        message: "",
+        isShown: false
     };
+
+    function showAlert(alertType, message) {
+        $scope.groupsAlert.message = message;
+        $scope.groupsAlert.isShown = true;
+        $scope.groupsAlert.alertType = alertType;
+    }
+
+    $scope.closeAlert = function () {
+        $scope.groupsAlert = {
+            alertType: "",
+            message: "",
+            isShown: false
+        };
+        if (!$scope.$$phase) {  //SAFE APPLY TO ANGULAR
+            $scope.$apply();
+        }
+    }
+});
+
+app.controller('ViewNoteCtrl', function($scope) {
+
+});
+
+
+app.controller('InviteFriendsCtrl', function($scope, $rootScope, $routeParams) {
+
 });
