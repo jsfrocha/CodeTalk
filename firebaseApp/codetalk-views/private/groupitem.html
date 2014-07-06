@@ -1,67 +1,86 @@
 <div class="container mainGroupItemSection" ng-controller="SingleGroupCtrl">
     <div class="row">
-        <div class="col-sm-12">
-            <div class="ct-header-title">
+        <div class="col-xs-12">
+            <div class="ct-header-title" ng-cloak>
                 {{currentGroup}}
+                <div class="btn-group pull-right">
+                    <button class="btn btn-warning">Invite Friend</button>
+                    <button class="btn btn-warning">Make Public</button>
+                </div>
             </div>
         </div>
     </div>
     <div class="row">
-        <div class="col-sm-12">
-            <div class="ct-column-title">
-                Code
-            </div>
-            <div id="editor-actions">
-                <label>Select a mode for the Editor &nbsp;&nbsp;&nbsp;</label>
-                <i id="selectorLoader" class="fa fa-cog fa-spin" ng-show="selectorLoader"></i>
-                <select id="aceModeSelector" ng-change="setMode()" ng-model="selectedMode" title="choose" ng-show="!selectorLoader">
-                    <option selected>Choose one...</option>
-                    <option ng-repeat="aceMode in aceModes" value="{{aceMode.modeCode}}">{{aceMode.modeName}}</option>
-                </select>
-            </div>
-            <div id="code-editor" ng-show="hasCode"></div>
+        <div class="col-xs-10">
+            <div class="ct-column-title">Code</div>
+            <div id="code-editor"></div>
         </div>
-        <div class="navmenu navmenu-default navmenu-fixed-right offcanvas">
-            <div class="ct-column-title">
-                Talk
+        <div class="col-xs-2 notesSection">
+            <div class="ct-column-title">Talk</div>
+            <button class="btn btn-success btn-full-width" data-toggle="modal" data-target="#addNoteModal"><i class="fa fa-plus"></i>&nbsp;&nbsp;Add Note</button>
+            <button class="btn btn-success btn-full-width" data-toggle="modal" data-target="#addSelectionModal"><i class="fa fa-plus"></i>&nbsp;&nbsp;Add Selection</button>
+        </div>
+    </div>
+</div>
+
+<!--Add Note Modal-->
+
+<div class="modal fade" id="addNoteModal" tabindex="-1" role="dialog" aria-labelledby="addNoteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="addNoteModalLabel">Add Note</h4>
             </div>
-            <div class="note-block active">
-                <div class="note-title">
-                    <input id="inputTitle" type="text" placeholder="Note Title" ng-model="newNote.title" />
-                    <div id="titleAlert" class="alert alert-danger alert-dismissable">
-                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-                        <strong>Warning!</strong> The note must have a title.
-                    </div>
-                </div>
-                <div class="note-description">
-                    <textarea id="inputDescription" rows="4" placeholder="Note Description" ng-model="newNote.description"></textarea>
-                </div>
-                <div class="note-btn-group">
-                    <button class="btn btn-primary btn-md" ng-show="!noteHasCode" ng-click="addCode(-1)" ng-cloak><i class="fa fa-plus"></i>&nbsp;&nbsp;Add Current Code</button>
-                    <h5 ng-show="noteHasCode" ng-cloak>Mode: {{note.codeMode}}</h5>
-                    <button class="btn btn-success btn-md pull-right" ng-click="saveNote()">
-                        <i class="fa fa-check" ng-show="!saveLoader" ng-cloak></i>
-                        <i id="saveLoader" class="fa fa-cog fa-spin" ng-show="saveLoader" ng-cloak></i>
-                    &nbsp;&nbsp;Save</button>
-                </div>
+            <div class="modal-body">
+                ...
             </div>
-            <div class="note-block note-loader" ng-show="noteLoader" ng-cloak>
-                <i id="noteLoader" class="fa fa-cog fa-spin"></i>
-            </div>
-            <div class="note-block" ng-repeat="note in notes | orderBy : 'createdAt' : true" ng-show="!noteLoader" ng-cloak>
-                <div class="note-title">{{note.noteTitle}} <h4 class="pull-right">{{note.createdAt | date : 'MMM dd, yyyy @ hh:mm:ss'}}</h4></div>
-                <div class="note-description">{{note.noteDescription}}</div>
-                <div class="note-btn-group">
-                    <button class="btn btn-primary btn-md" ng-hide="{{note.hasCode}}" ng-click="addCode(note)" ng-cloak><i class="fa fa-plus"></i>&nbsp;&nbsp;Add Current Code</button>
-                    <button class="btn btn-danger btn-md pull-right" ng-click="deleteNote(note)">
-                        <i class="fa fa-times" ng-show="!deleteLoader"></i>
-                        <i class="fa fa-cog fa-spin" ng-show="deleteLoader"></i>
-                    &nbsp;&nbsp;Delete</button>
-                    <h5 ng-show="{{note.hasCode}}" ng-cloak>Mode: {{note.noteMode}}</h5>
-                </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-success">Add Note</button>
             </div>
         </div>
     </div>
 </div>
 
-<script src="codetalk-scripts/editor.js"></script>
+<!--Add Selection Modal-->
+
+<div class="modal fade" id="addSelectionModal" tabindex="-1" role="dialog" aria-labelledby="addSelectionModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="addSelectionModalLabel">Add Note with Selection</h4>
+            </div>
+            <div class="modal-body">
+                ...
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-success">Add Note</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Invite Friends Modal-->
+
+<div class="modal fade" id="inviteFriendsModal" tabindex="-1" role="dialog" aria-labelledby="inviteFriendsModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="inviteFriendsModalLabel">Invite Friends</h4>
+            </div>
+            <div class="modal-body">
+                ...
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!--<script src="codetalk-scripts/editor.js"></script>-->

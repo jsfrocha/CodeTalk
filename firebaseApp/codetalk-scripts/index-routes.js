@@ -80,6 +80,10 @@ run(function($rootScope, $location, $firebaseSimpleLogin, $firebase) {
         return $firebase(new Firebase('https://codetalking.firebaseio.com/'+urlAdded));
     }
 
+    $rootScope.getNormalFBRef = function (urlAdded) {
+        return new Firebase('https://codetalking.firebaseio.com/'+urlAdded);
+    }
+
     
 
 });

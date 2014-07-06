@@ -4,6 +4,7 @@ app.controller('LandingCtrl', function($scope) {
 
 app.controller('NavbarCtrl', function($scope, $rootScope, $firebase, $location) {
 
+
     console.log("Enter NavbarCtrl, RootScope Auth: "+angular.toJson($rootScope.auth));
 
     $scope.authLoader = false;
@@ -13,7 +14,6 @@ app.controller('NavbarCtrl', function($scope, $rootScope, $firebase, $location) 
         $rootScope.auth.$login('password', {
             email: $scope.emailAuth,
             password: $scope.passwordAuth,
-            debug: true //TODO: Remove this (debug only)
         }).then(function(user) {
             if (!$scope.$$phase) {  //SAFE APPLY TO ANGULAR
                 $scope.$apply();
@@ -63,42 +63,32 @@ app.controller('NavbarCtrl', function($scope, $rootScope, $firebase, $location) 
 
 //Groups Page Controller
 app.controller('GroupsCtrl', function($scope, $rootScope, $firebase) {
-
     var aceModesRef = $rootScope.getFBRef('aceModes');
-
     var currentUserGroupsRef = $rootScope.getFBRef('users/'+$rootScope.auth.user.uid+'/allowedGroups');
 
     $scope.groups = currentUserGroupsRef;
-
     $scope.selectedMode = "NONE";
-
     $scope.aceModes = aceModesRef;
 
-    $scope.testFunction = function () {
-        console.log("Test Function - IN");
-        $scope.groupsRef = $rootScope.getFBRef('groups');
-        $scope.groupsRef.$on('loaded', function () {
-            var existingGroups = $scope.groupsRef.$getIndex();
-            var newGroupName = $scope.newGroupName;
-            existingGroups.forEach(function(key, i) {
-                if (existingGroups[i] == newGroupName) {
-                    showAlert('alert-danger', 'Group name already exists');
-                    return false;
-                }
-            });
-        });
-
-
-        console.log("Test Function - OUT");
-    }
-
+//    $scope.testFunction = function () {
+//        console.log("Test Function - IN");
+//        $scope.groupsRef = $rootScope.getFBRef('groups');
+//        $scope.groupsRef.$on('loaded', function () {
+//            var existingGroups = $scope.groupsRef.$getIndex();
+//            var newGroupName = $scope.newGroupName;
+//            existingGroups.forEach(function(key, i) {
+//                if (existingGroups[i] == newGroupName) {
+//                    showAlert('alert-danger', 'Group name already exists');
+//                    return false;
+//                }
+//            });
+//        });
+//    }
 
     $scope.createGroup = function () {
-
         var suggestName = function (name) {
             return name.replace(/[^a-z0-9]/gi, '');
         };
-
         var isNameValid = function (name) {
             var regex = /[^a-z0-9]/ig;
             if (name.match(regex)) return false;
@@ -106,10 +96,8 @@ app.controller('GroupsCtrl', function($scope, $rootScope, $firebase) {
         }
 
         var currentUserGroupRef = $rootScope.getFBRef('users/'+$rootScope.auth.user.uid+'/allowedGroups');
-
         var newGroupName = $scope.newGroupName;
         var selectedMode = $scope.selectedMode;
-
 
         //Add
         if (!!$scope.newGroupName) {
@@ -141,14 +129,11 @@ app.controller('GroupsCtrl', function($scope, $rootScope, $firebase) {
         }
     }
 
-
-
     $scope.groupsAlert = {
         alertType: "",
         message: "",
         isShown: false
     };
-
 
     function showAlert(alertType, message) {
         $scope.groupsAlert.message = message;
@@ -162,171 +147,28 @@ app.controller('GroupsCtrl', function($scope, $rootScope, $firebase) {
             $scope.$apply();
         }
     }
-
-
 });
 
-app.controller('SingleGroupCtrl', function($scope, $routeParams, $firebase) {
-   $scope.currentGroup = $routeParams.groupName;
+app.controller('SingleGroupCtrl', function($scope, $rootScope, $routeParams, $firebase) {
+    $scope.currentGroup = $routeParams.groupName;
+    var editor = ace.edit("code-editor");
+    editor.setTheme("ace/theme/github");
 
-});
+    var groupsRef = $rootScope.getNormalFBRef('groups');
 
-
-//Home Controller
-app.controller('HomeCtrl', function($scope, parseObjFactory, userFactory) {
-	$scope.hasCode = true;
-    
-    //Get ParseObj AceModes
-    $scope.selectorLoader = true;
-    parseObjFactory.getParseObj('AceModes')
-    .success(function(data) {
-        $scope.aceModes = data.results;
-        $scope.selectorLoader = false;
-    })
-    .error(function(data) {
-        console.log('Error Data: '+data);
-        $scope.selectorLoader = false;
-    });
-
-    //Get Current Notes
-    $scope.noteLoader = true;
-    parseObjFactory.getParseObj('CodeNotes')
-    .success(function(data) {
-        $scope.notes = data.results;
-        $scope.noteLoader = false;
-
-    })
-    .error(function(data) {
-        console.log('Error Data: '+data);
-        $scope.noteLoader = false;
-    });
-
-    //Set Editor Mode
-    $scope.setMode = function () {
-        var session = editor.getSession();
-        var option = $scope.selectedMode;
-        session.setMode("ace/mode/"+option);
-    };
-
-    //Save Note
-    $scope.saveNote = function () {
-        $scope.saveLoader = true;
-        var newNote = {
-            'noteTitle': $scope.newNote.title,
-            'noteDescription': $scope.newNote.description
-        };
-
-        if ($('#inputTitle').val() == '') {
-            $('#titleAlert').show();
-            $scope.saveLoader = false;
-        }
-        else {
-            parseObjFactory.createNote('CodeNotes', newNote)
-            .success(function(data) {
-                $scope.saveLoader = false;
-                $('#inputTitle').val('');
-                $('#inputDescription').val('');
-                $('#titleAlert').hide();
-                //Reload Notes
-                parseObjFactory.getParseObj('CodeNotes')
-                .success(function(data) {
-                    $scope.notes = data.results;
-                })
-                .error(function(data) {
-                    $('#inputTitle').val('Error');
-                    $('#inputDescription').val(angular.toJson(data));                        
-                    console.log('Error Data: '+data);
-                });
-            })
-            .error(function(data) {
-                $scope.saveLoader = false;
-                console.log('Error Data: '+data);
-            });
-        }
-    };
-    
-    //Delete Note
-    $scope.deleteNote = function (note) {
-        $scope.deleteLoader = true;
-        var noteId = note.objectId;
-        parseObjFactory.deleteNote('CodeNotes', noteId)
-        .success(function(data) {
-            //Reload Notes
-            parseObjFactory.getParseObj('CodeNotes')
-            .success(function(data) {
-                $scope.notes = data.results;
-                $scope.deleteLoader = false;
-            })
-            .error(function(data) {
-                $('#inputTitle').val('Error');
-                $('#inputDescription').val(angular.toJson(data));                        
-                console.log('Error Data: '+data);
-                $scope.deleteLoader = false;
-            });                    
-        })
-        .error(function(data) {
-            console.log('Error Data: '+data);
-            $scope.deleteLoader = false;
-        });
-    };
-    
-    //Add Code to Note
-    $scope.addCode = function (note) {
-        var code = {
-            "title":"",
-            "content":"",
-            "mode":""
-        };
-
-        if (note == -1) { //New Note
-            if ($('#inputTitle').val() == '') {
-                $('#titleAlert').show();
-                return 0;                
-            } else {
-                code.title = $scope.newNote.title;
-                if ($scope.selectedMode == undefined || $scope.selectedMode == "") {
-                    alert("Need to choose a Mode for the Code to Upload");
-                    return 0;
-                }
-                else {
-                    code.mode = $scope.selectedMode;
-                }
+    groupsRef.once('value', function(snap) {
+        snap.forEach(function(child) {
+            if (child.name() == $scope.currentGroup) {
+                editor.getSession().setMode("ace/mode/"+child.val().mode);
             }
-        } else {
-            code.title = note.title;
-            code.mode = note.noteMode;
-        }
-
-        if (editor.getSession().getValue().trim() == "") {
-            alert("Need to add Code to Upload");
-            return 0;
-        }
-        else {
-            code.content = editor.getSession().getValue();    
-        }
-        
-
-        //Upload Code to Parse
-        parseObjFactory.uploadCode(code.content, code.title)
-        .success(function(data) {
-            console.log("SUCCESS - Upload Code FROM SCOPE\n"+angular.toJson(data));
-            parseObjFactory.associateCode(data.name, code.mode, 'CodeChanges')
-            .success(function(data) {
-                console.log("SUCCESS - Associate Code FROM SCOPE\n"+angular.toJson(data));
-            })
-            .error(function(data) {
-                console.log("ERROR - Associate Code FROM SCOPE\n"+angular.toJson(data));
-            });
-
-        })
-        .error(function(data) {
-            console.log("ERROR - UploadCode FROM SCOPE\n"+angular.toJson(data));
         });
-    }
+    });
 
-    //Testing Parse Relations
-    $scope.setRelation = function () {
-        parseObjFactory.setRelation('12objClass', '12objId', '12relColumn0', '12relChild', '12childId');
-    }
-    
+    $scope.addNote = function () {
+
+    };
+
+    $scope.addSelection = function () {
+
+    };
 });
