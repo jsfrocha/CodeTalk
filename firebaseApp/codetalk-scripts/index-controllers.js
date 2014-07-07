@@ -184,7 +184,7 @@ app.controller('GroupsCtrl', function($scope, $rootScope) {
                }
            });
         });
-
+        //TODO: Set $scope.groups again after recycle
         console.log("Recycle - OUT");
     }
 
