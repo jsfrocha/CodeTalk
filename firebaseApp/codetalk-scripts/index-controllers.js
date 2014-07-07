@@ -1,3 +1,8 @@
+app.controller('IndexCtrl', function($rootScope) {
+    //Recycle Current User Groups (Delete /AllowedGroups that are no longer in /Groups
+
+});
+
 app.controller('LandingCtrl', function($scope) {
 
 });
@@ -13,7 +18,7 @@ app.controller('NavbarCtrl', function($scope, $rootScope, $firebase, $location) 
         $scope.authLoader = true;
         $rootScope.auth.$login('password', {
             email: $scope.emailAuth,
-            password: $scope.passwordAuth,
+            password: $scope.passwordAuth
         }).then(function(user) {
             if (!$scope.$$phase) {  //SAFE APPLY TO ANGULAR
                 $scope.$apply();
@@ -59,18 +64,27 @@ app.controller('NavbarCtrl', function($scope, $rootScope, $firebase, $location) 
         console.log("Logout Auth: "+$rootScope.auth.user);
         $location.path('/');
     }
+
+
+
+
+
+
 });
 
 //Groups Page Controller
-app.controller('GroupsCtrl', function($scope, $rootScope, $firebase) {
+app.controller('GroupsCtrl', function($scope, $rootScope) {
+
     var aceModesRef = $rootScope.getFBRef('aceModes');
     var currentUserGroupsRef = $rootScope.getFBRef('users/'+$rootScope.auth.user.uid+'/allowedGroups');
+    var currentUserId = $rootScope.auth.user.uid;
 
     $scope.groups = currentUserGroupsRef;
     $scope.selectedMode = "NONE";
     $scope.aceModes = aceModesRef;
 
     $scope.createGroup = function () {
+
         var suggestName = function (name) {
             return name.replace(/[^a-z0-9]/gi, '');
         };
@@ -80,62 +94,106 @@ app.controller('GroupsCtrl', function($scope, $rootScope, $firebase) {
             else return true;
         }
 
-        var currentUserGroupRef = $rootScope.getFBRef('users/'+$rootScope.auth.user.uid+'/allowedGroups');
+        var currentUserGroupRef = $rootScope.getFBRef('users/' + $rootScope.auth.user.uid + '/allowedGroups');
+
         var newGroupName = $scope.newGroupName;
         var selectedMode = $scope.selectedMode;
 
-        //Add
+        $scope.groupsAlert = {
+            alertType: "",
+            message: "",
+            isShown: false
+        };
+
+        function showAlert(alertType, message) {
+            $scope.groupsAlert.message = message;
+            $scope.groupsAlert.isShown = true;
+            $scope.groupsAlert.alertType = alertType;
+        }
+
+        $scope.closeAlert = function () {
+            $scope.groupsAlert.isShown = false;
+            if (!$scope.$$phase) {  //SAFE APPLY TO ANGULAR
+                $scope.$apply();
+            }
+        }
+
         if (!!$scope.newGroupName) {
-            if ($scope.selectedMode != "NONE") { //Happy path
-                if (isNameValid($scope.newGroupName)) {
+            if ($scope.selectedMode != "NONE") {
+                if (isNameValid($scope.newGroupName)) { //Happy Path
+
                     currentUserGroupRef.$add({
                         name: newGroupName,
-                        mode: selectedMode
+                        mode: selectedMode,
+                        createdBy: currentUserId
                     })
                         .then(function (ref) {
-                            var groupRef = $rootScope.getFBRef('groups/' + $scope.newGroupName);
+                            var groupRef = $rootScope.getFBRef('groups/' + $scope.newGroupName + '_' + currentUserId);
                             groupRef.$set({
                                 mode: selectedMode,
-                                isPrivate: true
+                                isPrivate: true,
+                                createdBy: currentUserId
                             });
                         });
                     angular.element('#new-groupname-input').val('');
                 }
-                else {//Invalid Characters
-                    showAlert('alert-danger', "Invalid characters, try: '"+suggestName($scope.newGroupName)+"'");
+                else { //Invalid Characters
+                    showAlert('alert-danger', "Invalid characters, try: '" + suggestName($scope.newGroupName) + "'");
+                    angular.element('#new-groupname-input').val('');
                 }
             }
-            else { //No Selected Mode
-                showAlert('alert-danger', 'Please select a mode for the group');
+            else { //No selected Mode
+                showAlert('alert-danger', "A mode needs to be selected");
+                angular.element('#new-groupname-input').val('');
             }
         }
-        else { //New Group Name is Empty
-            showAlert('alert-danger', 'Please insert a name for the group');
+        else { //Group name empty
+            showAlert('alert-danger', "The group needs a name");
+            angular.element('#new-groupname-input').val('');
         }
+
+    }//End createGroup()
+
+    //Recycle already Deleted Groups TODO: Untested
+    if (!!$rootScope.auth.user) {
+        console.log("Recycle - IN");
+        var currentUser = $rootScope.auth.user.uid;
+        var groupsRef = $rootScope.getNormalFBRef('groups');
+        var allowedGroupsRef = $rootScope.getNormalFBRef('users/'+currentUser+'/allowedGroups');
+        var groupRemovalRef = $rootScope.getFBRef('users/'+currentUser+'/allowedGroups');
+
+
+        groupsRef.once('value', function(groupSnap) {
+           allowedGroupsRef.once('value', function(allowedSnap) {
+               var existingGroups = [];
+               var groupsToRemove = [];
+               groupSnap.forEach(function(groupChild) {
+                    existingGroups.push(groupChild.name());
+               });
+               allowedSnap.forEach(function(allowedChild) {
+                    var groupName = allowedChild.val().name;
+                    var fullName = groupName + '_' + currentUser;
+                    if (existingGroups.indexOf(fullName) != -1) {
+                        groupsToRemove.push(allowedChild.name());
+                    }
+               });
+               if (!!groupsToRemove && groupsToRemove.length > 0) {
+                   for (var i = 0; i < groupsToRemove.length; i++) {
+                       groupRemovalRef.$remove(groupsToRemove[i]);
+                   }
+               }
+           });
+        });
+
+        console.log("Recycle - OUT");
     }
 
-    $scope.groupsAlert = {
-        alertType: "",
-        message: "",
-        isShown: false
-    };
-
-    function showAlert(alertType, message) {
-        $scope.groupsAlert.message = message;
-        $scope.groupsAlert.isShown = true;
-        $scope.groupsAlert.alertType = alertType;
-    }
-
-    $scope.closeAlert = function () {
-        $scope.groupsAlert.isShown = false;
-        if (!$scope.$$phase) {  //SAFE APPLY TO ANGULAR
-            $scope.$apply();
-        }
-    }
 });
 
 app.controller('SingleGroupCtrl', function($scope, $rootScope, $routeParams, $firebase) {
     $scope.currentGroup = $routeParams.groupName;
+    var currentUserId = $rootScope.auth.user.uid;
+    $scope.isUserAdmin = false;
 
     $scope.editor = ace.edit("code-editor");
     $scope.editor.setTheme("ace/theme/github");
@@ -148,7 +206,8 @@ app.controller('SingleGroupCtrl', function($scope, $rootScope, $routeParams, $fi
     var groupsRef = $rootScope.getNormalFBRef('groups');
     groupsRef.once('value', function(snap) {
         snap.forEach(function(child) {
-            if (child.name() == $scope.currentGroup) {
+            if (child.name() == $scope.currentGroup + '_' + currentUserId) {
+                if (child.val().createdBy == currentUserId) $scope.isUserAdmin = true;
                 $scope.groupMode = child.val().mode;
                 $scope.editor.getSession().setMode("ace/mode/"+$scope.groupMode);
                 $scope.modalEditor.getSession().setMode("ace/mode/"+$scope.groupMode);
@@ -161,6 +220,31 @@ app.controller('SingleGroupCtrl', function($scope, $rootScope, $routeParams, $fi
     $scope.editor.on('blur', function() {
        $scope.modalEditor.getSession().setValue($scope.editor.session.getTextRange($scope.editor.getSelectionRange()));
     });
+
+
+    $scope.groupsAlert = {
+        alertType: "",
+        message: "",
+        isShown: false
+    };
+
+    $scope.showAlert = function(alertType, message) {
+        $scope.groupsAlert.message = message;
+        $scope.groupsAlert.isShown = true;
+        $scope.groupsAlert.alertType = alertType;
+    }
+
+    $scope.closeAlert = function () {
+        $scope.groupsAlert.isShown = false;
+        $scope.groupsAlert.alertType = "";
+        $scope.groupsAlert.message = "";
+
+        if (!$scope.$$phase) {  //SAFE APPLY TO ANGULAR
+            $scope.$apply();
+        }
+    }
+
+
 });
 
 app.controller('AddNoteCtrl', function($scope, $rootScope) {
@@ -171,7 +255,7 @@ app.controller('AddNoteCtrl', function($scope, $rootScope) {
 
     $scope.addNote = function () {
         console.log("addnote in");
-
+        var currentUserId = $rootScope.auth.user.uid;
         $scope.modalEditor.setValue($scope.codeContent);
 
         if (typeof $scope.newNote != undefined && $scope.newNote.noteTitle && $scope.newNote.noteContent) {
@@ -197,7 +281,18 @@ app.controller('AddNoteCtrl', function($scope, $rootScope) {
             }
 
             if (existingNotes.indexOf(title) == -1) {
+
+                //Set Note in /Notes -> [GROUPNAME]_[NOTETITLE]
                 currentNoteRef.$set({
+                    content: content,
+                    code: code
+                });
+
+                var groupNotesRef = $rootScope.getFBRef('groups/'+$scope.currentGroup + '_' + currentUserId+'/notes');
+
+                //Add Note to Groups/Notes
+                groupNotesRef.$add({
+                    title: title,
                     content: content,
                     code: code
                 });
@@ -208,7 +303,7 @@ app.controller('AddNoteCtrl', function($scope, $rootScope) {
                 angular.element('#addNoteModal').modal('hide');
             }
             else {
-                showAlert('alert-danger', 'Note "'+title+'" already exists in this group');
+                $scope.showAlert('alert-danger', 'Note "'+title+'" already exists in this group');
             }
 
             console.log("Note\n");
@@ -219,32 +314,37 @@ app.controller('AddNoteCtrl', function($scope, $rootScope) {
 
         }
         else {
-            showAlert('alert-danger', 'Both fields are mandatory');
+           $scope.showAlert('alert-danger', 'Both fields are mandatory');
         }
     };
 
-    $scope.groupsAlert = {
-        alertType: "",
-        message: "",
-        isShown: false
-    };
+});
 
-    function showAlert(alertType, message) {
-        $scope.groupsAlert.message = message;
-        $scope.groupsAlert.isShown = true;
-        $scope.groupsAlert.alertType = alertType;
-    }
+app.controller('DeleteGroupCtrl', function($scope, $rootScope, $location) {
+    $scope.deleteGroup = function () {
+        var groupNameConfirmation = $scope.deleteGroupConfirm;
+        var currentGroup = $scope.currentGroup;
+        var currentUser = $rootScope.auth.user.uid;
 
-    $scope.closeAlert = function () {
-        $scope.groupsAlert = {
-            alertType: "",
-            message: "",
-            isShown: false
-        };
-        if (!$scope.$$phase) {  //SAFE APPLY TO ANGULAR
-            $scope.$apply();
+
+        console.log(groupNameConfirmation);
+        console.log(currentGroup);
+
+        if (groupNameConfirmation == currentGroup) {
+            var groupsRef = $rootScope.getFBRef('groups');
+
+            //Delete from /Groups
+            groupsRef.$remove(currentGroup + '_' + currentUser);
+
+            angular.element('#deleteGroupModal').modal('hide');
+
+            $location.path('/start');
         }
-    }
+        else {
+            $scope.showAlert('alert-danger', 'The group name inserted does not match the current group!');
+        }
+
+    };
 });
 
 app.controller('ViewNoteCtrl', function($scope) {

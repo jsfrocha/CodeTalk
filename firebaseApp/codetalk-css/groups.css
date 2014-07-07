@@ -116,6 +116,10 @@
     min-height: 500px;
 }
 
+.modal-confirmDelete {
+    min-height: 185px;
+}
+
 .notesSection {
     font-family: 'Roboto', sans-serif;
 }

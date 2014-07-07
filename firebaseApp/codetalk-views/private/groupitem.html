@@ -2,6 +2,9 @@
     <div class="row">
         <div class="col-xs-12">
             <div class="ct-header-title" ng-cloak>
+                <div class="btn-group pull-left">
+                    <button class="btn btn-danger" ng-show="isUserAdmin" data-toggle="modal" data-target="#deleteGroupModal"><i class="fa fa-times"></i>&nbsp;&nbsp;Delete Group</button>
+                </div>
                 {{currentGroup}}
                 <div class="btn-group pull-right">
                     <button class="btn btn-warning" data-toggle="modal" data-target="#inviteFriendsModal">Invite Friend</button>
@@ -95,6 +98,41 @@
         </div>
     </div>
 </div>
+
+<!--Delete Group Modal-->
+
+<div class="modal fade" id="deleteGroupModal" tabindex="-1" role="dialog" aria-labelledby="deleteGroupModalLabel" aria-hidden="true" ng-controller="DeleteGroupCtrl">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="deleteGroupModalLabel">Delete Group</h4>
+            </div>
+            <div class="modal-body modal-confirmDelete">
+                <div class="alert alert-danger alert-dismissable" role="alert" ng-show="true">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                    <strong>Warning!</strong> You are about to delete this group and all of its contents.
+                </div>
+                <div class="alert alert-groups {{groupsAlert.alertType}}" ng-show="groupsAlert.isShown">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true" ng-click="closeAlert()">&times;</button>
+                    {{groupsAlert.message}}
+                </div>
+                <form role="form">
+                    <div class="form-group">
+                        <label for="confimGroupName">Insert the Group name to Delete</label>
+                        <input type="text" class="form-control" id="confimGroupName" ng-model="deleteGroupConfirm"/>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" ng-click="deleteGroup()">Delete Group</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 
 
 <!--<script src="codetalk-scripts/editor.js"></script>-->

@@ -3,7 +3,11 @@
   "public": ".",
   "ignore": [
     "firebase.json",
+    "codetalk-structure.json",
+    "codetalk-json-toUpload.json",
+    "guid-generator.js",
     ".*",
-    "**/node_modules/**"
+    "**/node_modules/**",
+    "**/.idea/**"
   ]
 }
