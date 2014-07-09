@@ -52,8 +52,8 @@
     margin-bottom: 15px;
 }
 
-.groupsForm > .form-group > input {
-    width: 453px;
+.groupsForm > .form-horizontal > input {
+    width: 85%;
 }
 
 .groupItem:hover {
@@ -112,7 +112,7 @@
     border-radius: 4px;
 }
 
-.modal-body {
+.modal-addNote {
     min-height: 500px;
 }
 

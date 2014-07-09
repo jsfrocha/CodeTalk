@@ -3,7 +3,7 @@
         <div class="col-xs-12">
             <div class="ct-header-title" ng-cloak>
                 <div class="btn-group pull-left">
-                    <button class="btn btn-danger" ng-show="isUserAdmin" data-toggle="modal" data-target="#deleteGroupModal"><i class="fa fa-times"></i>&nbsp;&nbsp;Delete Group</button>
+                    <button class="btn btn-danger" data-toggle="modal" data-target="#deleteGroupModal"><i class="fa fa-times"></i>&nbsp;&nbsp;Leave Group</button>
                 </div>
                 {{currentGroup}}
                 <div class="btn-group pull-right">
@@ -15,7 +15,13 @@
     </div>
     <div class="row">
         <div class="col-xs-10">
-            <div class="ct-column-title">Code<div class="codeTip">Select code when adding a note!</div></div>
+            <div class="ct-column-title">Code
+                <div class="codeTip">
+                    <p style="display: inline; margin-right: -150px;">Select code when adding a note!</p>
+                    <button type="button" class="btn btn-info pull-right" style="margin-top: -15px;" ng-hide="codeLocked" ng-cloak ng-click="saveLockCode()"> <i class="fa fa-spinner fa-spin" ng-show="saveLoader"></i>&nbsp;Save & Lock Code</button>
+                    <button type="button" class="btn btn-info pull-right" style="margin-top: -15px;" ng-show="codeLocked && isUserAdmin" ng-cloak ng-click="unlockCode()"> <i class="fa fa-spinner fa-spin" ng-show="saveLoader"></i>&nbsp;Unlock Code</button>
+                </div>
+            </div>
             <div id="code-editor"></div>
         </div>
         <div class="col-xs-2 notesSection">
@@ -48,7 +54,7 @@
                     <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
                     <h4 class="modal-title" id="addNoteModalLabel">Add Note in {{currentGroup}}</h4>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body modal-addNote">
                     <div class="alert alert-groups {{groupsAlert.alertType}}" ng-show="groupsAlert.isShown">
                         <button type="button" class="close" data-dismiss="alert" aria-hidden="true" ng-click="closeAlert()">&times;</button>
                         {{groupsAlert.message}}
@@ -125,7 +131,7 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-danger" ng-click="deleteGroup()">Delete Group</button>
+                <button type="button" class="btn btn-danger" ng-click="deleteGroup()">Leave Group</button>
                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
             </div>
         </div>

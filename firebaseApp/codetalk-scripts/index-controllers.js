@@ -9,54 +9,82 @@ app.controller('LandingCtrl', function($scope) {
 
 app.controller('NavbarCtrl', function($scope, $rootScope, $firebase, $location) {
 
-
     console.log("Enter NavbarCtrl, RootScope Auth: "+angular.toJson($rootScope.auth));
+
+    var emailValidation = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+/;
 
     $scope.authLoader = false;
 
+    $scope.signUpData = {
+      email: '',
+      password: ''
+    };
+
     $scope.submitAuth = function () {
-        $scope.authLoader = true;
-        $rootScope.auth.$login('password', {
-            email: $scope.emailAuth,
-            password: $scope.passwordAuth
-        }).then(function(user) {
-            if (!$scope.$$phase) {  //SAFE APPLY TO ANGULAR
-                $scope.$apply();
-            }
-            $scope.emailAuth = '';
-            $scope.passwordAuth = '';
-            $scope.authLoader = false;
-            $location.path('/start');
-        }, function(error) {
-            if (error.code == 'INVALID_USER') {
-                console.log(error.message+" Trying to sign you up!");
-                $rootScope.auth.$createUser($scope.emailAuth, $scope.passwordAuth, false)//False -> Log-in after sign up ; True -> Don't Login after signup
-                    .then(function(user) {
-                        $rootScope.auth.user = user;
-                        var newUserRef = $rootScope.getFBRef('users/'+$rootScope.auth.user.uid);
-                        //Add user to firebase and angular
-                        //$scope.user = user; //Not sure if needed
-                        if (!$scope.$$phase) {  //SAFE APPLY TO ANGULAR
-                            $scope.$apply();
-                        }
-                        newUserRef.$set({
-                            id: user.id,
-                            email: user.email,
-                            provider: user.provider
-                        });
-                        if (!$scope.$$phase) {  //SAFE APPLY TO ANGULAR
-                            $scope.$apply();
-                        }
-                        $scope.authLoader = false;
-                        $scope.emailAuth = '';
-                        $scope.passwordAuth = '';
-                        $location.path('/start');
-                    }, function(error) {
-                        console.log("Error creating user: "+angular.toJson(error));
-                })
-            }
-        })
+        if (!$scope.emailAuth.match(emailValidation)) {
+            showAlert('alert-danger', 'Email is not valid');
+        } else {
+            $scope.authLoader = true;
+            $rootScope.auth.$login('password', {
+                email: $scope.emailAuth,
+                password: $scope.passwordAuth
+            }).then(function (user) {
+                if (!$scope.$$phase) {  //SAFE APPLY TO ANGULAR
+                    $scope.$apply();
+                }
+                $scope.emailAuth = '';
+                $scope.passwordAuth = '';
+                $scope.authLoader = false;
+                $location.path('/start');
+            }, function (error) {
+                if (error.code == 'INVALID_USER') {
+                    showAlert('alert-danger', 'User does not exist');
+                    $scope.emailAuth = '';
+                    $scope.passwordAuth = '';
+                    angular.element('#signInEmailId').val('');
+                    angular.element('#signInPasswordId').val('');
+                    $scope.authLoader = false;
+                }
+            })
+        }
     }
+
+    $scope.createUser = function() {
+
+        $scope.authLoader = true;
+
+        $rootScope.auth.$createUser($scope.signUpData.email, $scope.signUpData.password, true)//False -> Log-in after sign up ; True -> Don't Login after signup
+            .then(function(user) {
+               // $rootScope.auth.user = user;
+                console.log('Create User. '+user.uid);
+                var newUserRef = $rootScope.getFBRef('users/'+user.uid);
+                //Add user to firebase and angular
+
+                if (!$scope.$$phase) {  //SAFE APPLY TO ANGULAR
+                    $scope.$apply();
+                }
+                newUserRef.$set({
+                    id: user.id,
+                    email: user.email,
+                    provider: user.provider
+                });
+                if (!$scope.$$phase) {  //SAFE APPLY TO ANGULAR
+                    $scope.$apply();
+                }
+                $scope.authLoader = false;
+                $scope.signUpData.email = '';
+                $scope.signUpData.password = '';
+                $scope.authLoader = false;
+
+                angular.element('#signUpModal').modal('hide');
+                $location.path('/start');
+
+            }, function(error) {
+                $scope.authLoader = false;
+                showAlert('alert-danger', error.code);
+                console.log("Error creating user: "+angular.toJson(error));
+            })
+    };
 
     $scope.logout = function () {
         $rootScope.auth.$logout();
@@ -66,7 +94,24 @@ app.controller('NavbarCtrl', function($scope, $rootScope, $firebase, $location) 
     }
 
 
+    $scope.groupsAlert = {
+        alertType: "",
+        message: "",
+        isShown: false
+    };
 
+    function showAlert(alertType, message) {
+        $scope.groupsAlert.message = message;
+        $scope.groupsAlert.isShown = true;
+        $scope.groupsAlert.alertType = alertType;
+    }
+
+    $scope.closeAlert = function () {
+        $scope.groupsAlert.isShown = false;
+        if (!$scope.$$phase) {  //SAFE APPLY TO ANGULAR
+            $scope.$apply();
+        }
+    }
 
 
 
@@ -79,9 +124,13 @@ app.controller('GroupsCtrl', function($scope, $rootScope) {
     var currentUserGroupsRef = $rootScope.getFBRef('users/'+$rootScope.auth.user.uid+'/allowedGroups');
     var currentUserId = $rootScope.auth.user.uid;
 
+    //Remove leftover modal backdrop
+    angular.element('.modal-backdrop').remove();
+
     $scope.groups = currentUserGroupsRef;
     $scope.selectedMode = "NONE";
     $scope.aceModes = aceModesRef;
+
 
     $scope.createGroup = function () {
 
@@ -98,6 +147,47 @@ app.controller('GroupsCtrl', function($scope, $rootScope) {
 
         var newGroupName = $scope.newGroupName;
         var selectedMode = $scope.selectedMode;
+
+        if (!!newGroupName) {
+            if ($scope.selectedMode != "NONE") {
+                if (isNameValid(newGroupName)) { //Happy Path
+                    currentUserGroupRef.$add({
+                        name: newGroupName,
+                        mode: selectedMode,
+                        createdBy: currentUserId
+                    })
+                        .then(function (ref) {
+                            var groupRef = $rootScope.getFBRef('groups/' + newGroupName + '_' + currentUserId);
+                            groupRef.$set({
+                                mode: selectedMode,
+                                isPrivate: true,
+                                isCodeLocked: false,
+                                code: '',
+                                createdBy: currentUserId
+                            });
+                        }, function(err) {
+                            if (err.code == "PERMISSION_DENIED") {
+                                showAlert('alert-danger', 'You already created a group with that name.');
+                                angular.element('#new-groupname-input').val('');
+                            }
+                        });
+                    angular.element('#new-groupname-input').val('');
+                }
+                else { //Invalid Characters
+                    showAlert('alert-danger', "Invalid characters, try: '" + suggestName(newGroupName) + "'");
+                    angular.element('#new-groupname-input').val('');
+                }
+            }
+            else { //No selected Mode
+                showAlert('alert-danger', "A mode needs to be selected");
+                angular.element('#new-groupname-input').val('');
+            }
+        }
+        else { //Group name empty
+            showAlert('alert-danger', "The group needs a name");
+            angular.element('#new-groupname-input').val('');
+        }
+
 
         $scope.groupsAlert = {
             alertType: "",
@@ -118,82 +208,22 @@ app.controller('GroupsCtrl', function($scope, $rootScope) {
             }
         }
 
-        if (!!$scope.newGroupName) {
-            if ($scope.selectedMode != "NONE") {
-                if (isNameValid($scope.newGroupName)) { //Happy Path
-
-                    currentUserGroupRef.$add({
-                        name: newGroupName,
-                        mode: selectedMode,
-                        createdBy: currentUserId
-                    })
-                        .then(function (ref) {
-                            var groupRef = $rootScope.getFBRef('groups/' + $scope.newGroupName + '_' + currentUserId);
-                            groupRef.$set({
-                                mode: selectedMode,
-                                isPrivate: true,
-                                createdBy: currentUserId
-                            });
-                        });
-                    angular.element('#new-groupname-input').val('');
-                }
-                else { //Invalid Characters
-                    showAlert('alert-danger', "Invalid characters, try: '" + suggestName($scope.newGroupName) + "'");
-                    angular.element('#new-groupname-input').val('');
-                }
-            }
-            else { //No selected Mode
-                showAlert('alert-danger', "A mode needs to be selected");
-                angular.element('#new-groupname-input').val('');
-            }
-        }
-        else { //Group name empty
-            showAlert('alert-danger', "The group needs a name");
-            angular.element('#new-groupname-input').val('');
-        }
 
     }//End createGroup()
 
-    //Recycle already Deleted Groups TODO: Untested
-    if (!!$rootScope.auth.user) {
-        console.log("Recycle - IN");
-        var currentUser = $rootScope.auth.user.uid;
-        var groupsRef = $rootScope.getNormalFBRef('groups');
-        var allowedGroupsRef = $rootScope.getNormalFBRef('users/'+currentUser+'/allowedGroups');
-        var groupRemovalRef = $rootScope.getFBRef('users/'+currentUser+'/allowedGroups');
 
-
-        groupsRef.once('value', function(groupSnap) {
-           allowedGroupsRef.once('value', function(allowedSnap) {
-               var existingGroups = [];
-               var groupsToRemove = [];
-               groupSnap.forEach(function(groupChild) {
-                    existingGroups.push(groupChild.name());
-               });
-               allowedSnap.forEach(function(allowedChild) {
-                    var groupName = allowedChild.val().name;
-                    var fullName = groupName + '_' + currentUser;
-                    if (existingGroups.indexOf(fullName) != -1) {
-                        groupsToRemove.push(allowedChild.name());
-                    }
-               });
-               if (!!groupsToRemove && groupsToRemove.length > 0) {
-                   for (var i = 0; i < groupsToRemove.length; i++) {
-                       groupRemovalRef.$remove(groupsToRemove[i]);
-                   }
-               }
-           });
-        });
-        //TODO: Set $scope.groups again after recycle
-        console.log("Recycle - OUT");
-    }
 
 });
 
-app.controller('SingleGroupCtrl', function($scope, $rootScope, $routeParams, $firebase) {
+app.controller('SingleGroupCtrl', function($scope, $rootScope, $routeParams) {
+
+    $scope.codeLocked = true;
+
     $scope.currentGroup = $routeParams.groupName;
     var currentUserId = $rootScope.auth.user.uid;
     $scope.isUserAdmin = false;
+
+    $scope.saveLoader = false;
 
     $scope.editor = ace.edit("code-editor");
     $scope.editor.setTheme("ace/theme/github");
@@ -206,20 +236,77 @@ app.controller('SingleGroupCtrl', function($scope, $rootScope, $routeParams, $fi
     var groupsRef = $rootScope.getNormalFBRef('groups');
     groupsRef.once('value', function(snap) {
         snap.forEach(function(child) {
+            console.log("child: "+child);
             if (child.name() == $scope.currentGroup + '_' + currentUserId) {
+                //Found current group
                 if (child.val().createdBy == currentUserId) $scope.isUserAdmin = true;
+
                 $scope.groupMode = child.val().mode;
                 $scope.editor.getSession().setMode("ace/mode/"+$scope.groupMode);
                 $scope.modalEditor.getSession().setMode("ace/mode/"+$scope.groupMode);
+
+                if (child.val().isCodeLocked == true) $scope.codeLocked = true;
+                else $scope.codeLocked = false;
+
+                if (child.val().code != '') {
+                    $scope.editor.getSession().setValue(child.val().code);
+                }
             }
         });
+        if (!$scope.$$phase) {  //SAFE APPLY TO ANGULAR
+            $scope.$apply();
+        }
+
+
     });
 
-    $scope.notes = $rootScope.getFBRef('notes');
+
+
+
+    $scope.saveLockCode = function () {
+        var code = $scope.editor.getSession().getValue();
+        var currentGroup = $routeParams.groupName;
+        var currentUserId = $rootScope.auth.user.uid;
+
+        var currentGroupRef = $rootScope.getFBRef('groups/'+currentGroup+'_'+currentUserId);
+
+        $scope.saveLoader = true;
+        if (!!code) {
+            $scope.editor.setReadOnly(true);
+
+            currentGroupRef.$set({
+               isCodeLocked: true,
+               code: code
+            });
+
+            $scope.saveLoader = false;
+        }
+        else {
+            $scope.saveLoader = false;
+        }
+    };
+
+    $scope.unlockCode = function () {
+        var currentGroup = $routeParams.groupName;
+        var currentUserId = $rootScope.auth.user.uid;
+        var currentGroupRef = $rootScope.getFBRef('groups/'+currentGroup+'_'+currentUserId);
+
+        $scope.saveLoader = true;
+
+        $scope.editor.setReadOnly(false);
+
+        currentGroupRef.$set({
+           isCodeLocked: false
+        });
+
+        $scope.saveLoader = false;
+
+    };
 
     $scope.editor.on('blur', function() {
        $scope.modalEditor.getSession().setValue($scope.editor.session.getTextRange($scope.editor.getSelectionRange()));
     });
+
 
 
     $scope.groupsAlert = {
@@ -273,39 +360,40 @@ app.controller('AddNoteCtrl', function($scope, $rootScope) {
                 snap.forEach(function(child) {
                     existingNotesArray.push(child.name());
                 });
+
+                var existingNotes = new Array();
+                for (var i = 0; i < existingNotesArray.length; i++) {
+                    if (existingNotesArray[i].split('_')[0] == $scope.currentGroup)
+                        existingNotes.push(existingNotesArray[i].split('_')[1]);
+                }
+
+                if (existingNotes.indexOf(title) == -1) {
+                    console.log("Set current Note - IN");
+                    //Set Note in /Notes -> [GROUPNAME]_[NOTETITLE]
+                    currentNoteRef.$set({
+                        content: content,
+                        code: code
+                    });
+                    console.log("Set current Note - OUT");
+                    var groupNotesRef = $rootScope.getFBRef('groups/'+$scope.currentGroup + '_' + currentUserId+'/notes');
+                    console.log("Set group Note - IN");
+                    //Add Note to Groups/Notes
+                    groupNotesRef.$add({
+                        title: title,
+                        content: content,
+                        code: code
+                    });
+                    console.log("Set group note - OUT");
+
+                    $scope.newNote.noteTitle = "";
+                    $scope.newNote.noteContent = "";
+                    $scope.modalEditor.getSession().setValue('');
+                    angular.element('#addNoteModal').modal('hide');
+                }
+                else {
+                    $scope.showAlert('alert-danger', 'Note "'+title+'" already exists in this group');
+                }
             });
-            var existingNotes = new Array();
-            for (var i = 0; i < existingNotesArray.length; i++) {
-                if (existingNotesArray[i].split('_')[0] == $scope.currentGroup)
-                    existingNotes.push(existingNotesArray[i].split('_')[1]);
-            }
-
-            if (existingNotes.indexOf(title) == -1) {
-
-                //Set Note in /Notes -> [GROUPNAME]_[NOTETITLE]
-                currentNoteRef.$set({
-                    content: content,
-                    code: code
-                });
-
-                var groupNotesRef = $rootScope.getFBRef('groups/'+$scope.currentGroup + '_' + currentUserId+'/notes');
-
-                //Add Note to Groups/Notes
-                groupNotesRef.$add({
-                    title: title,
-                    content: content,
-                    code: code
-                });
-
-                $scope.newNote.noteTitle = "";
-                $scope.newNote.noteContent = "";
-                $scope.modalEditor.getSession().setValue('');
-                angular.element('#addNoteModal').modal('hide');
-            }
-            else {
-                $scope.showAlert('alert-danger', 'Note "'+title+'" already exists in this group');
-            }
-
             console.log("Note\n");
             console.log("Title: "+title+"\n");
             console.log("Content: "+content+"\n");
@@ -321,20 +409,27 @@ app.controller('AddNoteCtrl', function($scope, $rootScope) {
 });
 
 app.controller('DeleteGroupCtrl', function($scope, $rootScope, $location) {
+
     $scope.deleteGroup = function () {
         var groupNameConfirmation = $scope.deleteGroupConfirm;
+
         var currentGroup = $scope.currentGroup;
         var currentUser = $rootScope.auth.user.uid;
-
 
         console.log(groupNameConfirmation);
         console.log(currentGroup);
 
         if (groupNameConfirmation == currentGroup) {
-            var groupsRef = $rootScope.getFBRef('groups');
+            var groupsRef = $rootScope.getFBRef('users/'+currentUser+'/allowedGroups');
 
-            //Delete from /Groups
-            groupsRef.$remove(currentGroup + '_' + currentUser);
+            //Delete from /AllowedGroups
+            var keys = groupsRef.$getIndex();
+
+            keys.forEach(function(key, i) {
+               if (groupsRef[key].name == currentGroup) {
+                   groupsRef.$remove(key);
+               }
+            });
 
             angular.element('#deleteGroupModal').modal('hide');
 

@@ -120,47 +120,8 @@ ng\:form {
     display: block;
 }
 
-/*
-.social-login-btn {
-    text-align: center;
-    margin-top: 40px;
+.signInAlert {
+    display: inline;
+    padding: 8px;
+    margin-right: 10px;
 }
-*/
-
-/*
-.modal-header {
-	border-bottom: 1px solid #FF6600;
-}
-*/
-
-/*
-.alert {
-	display: none;
-	margin-top: 30px;
-}
-*/
-
-/*
-.formTitle {
-	text-align: center;
-	padding-bottom: 10px;
-	margin-top: -25px;
-	color: #ffffff;
-}
-
-	.formTitle > h3 {
-		font-weight: 400;
-		font-family: 'Roboto', sans-serif;
-	}
-*/
-/*
-.colLogin {
-
-	text-align: center;
-}
-*/
-/*
-.navbar-landing {
-	height: 100px;
-}
-*/

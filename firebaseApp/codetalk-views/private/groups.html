@@ -9,7 +9,6 @@
                     <button type="button" class="close" data-dismiss="alert" aria-hidden="true" ng-click="closeAlert()">&times;</button>
                     {{groupsAlert.message}}
                 </div>
-                <button class="btn btn-default" ng-click="testFunction()">Test Button</button>
                 <div class="form-group modeSelector">
                     <label for="modeSelector">Choose the Mode:</label>
                     <select id="modeSelector" class="form-control" data-ng-model="selectedMode" required>
@@ -17,7 +16,7 @@
                     </select>
                 </div>
                 <form class="form-inline groupsForm" ng-submit="createGroup()">
-                    <div class="form-group">
+                    <div class="form-horizontal">
                         <input type="text" class="form-control" placeholder="Group Name" ng-model="newGroupName" id="new-groupname-input">
                         <button type="submit" class="btn btn-success">Create</button>
                     </div>
