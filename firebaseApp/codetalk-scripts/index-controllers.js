@@ -286,34 +286,6 @@ app.controller('SingleGroupCtrl', function($scope, $rootScope, $routeParams) {
         }
     });
 
-
-
-
-//    $scope.saveLockCode = function () {
-//        var code = $scope.editor.getSession().getValue();
-//        var currentGroup = $routeParams.groupName;
-//
-//        var currentGroupRef = $rootScope.getFBRef('groups/'+currentGroup);
-//
-//        $scope.saveLoader = true;
-//        if (!!code) {
-//            $scope.editor.setReadOnly(true);
-//
-//            currentGroupRef.$update({
-//               isCodeLocked: true,
-//               code: code
-//            });
-//
-//            $scope.codeLocked = true;
-//
-//
-//            $scope.saveLoader = false;
-//        }
-//        else {
-//            $scope.saveLoader = false;
-//        }
-//    };
-
     $scope.saveCode = function() {
         var code = $scope.editor.getSession().getValue();
         var currentGroup = $routeParams.groupName;
@@ -372,8 +344,7 @@ app.controller('SingleGroupCtrl', function($scope, $rootScope, $routeParams) {
     $scope.changeGroupVisibility = function () {
 
         var currentGroup = $routeParams.groupName;
-        var currentUserId = $rootScope.auth.user.uid;
-        var currentGroupRef = $rootScope.getFBRef('groups/'+currentGroup+'_'+currentUserId);
+        var currentGroupRef = $rootScope.getFBRef('groups/'+currentGroup);
 
         currentGroupRef.$on('loaded', function(data) {
             console.log(data);
@@ -486,7 +457,7 @@ app.controller('AddNoteCtrl', function($scope, $rootScope) {
                         createdAt: dateToAdd,
                         createdBy: currentUserEmail
                     });
-                    var groupNotesRef = $rootScope.getFBRef('groups/'+$scope.currentGroup + '_' + currentUserId+'/notes');
+                    var groupNotesRef = $rootScope.getFBRef('groups/'+$scope.currentGroupFull+'/notes');
 
                     //Add Note to Groups/Notes
                     groupNotesRef.$add({
