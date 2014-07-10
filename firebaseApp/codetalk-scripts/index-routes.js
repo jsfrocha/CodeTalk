@@ -84,6 +84,41 @@ run(function($rootScope, $location, $firebaseSimpleLogin, $firebase) {
         return new Firebase('https://codetalking.firebaseio.com/'+urlAdded);
     }
 
+    $rootScope.setupFileDragAndDrop = function (editorDiv, editor) {
+        debugger;
+        console.log("FileDAD - IN");
+        addFileDragAndDropEventListeners(editorDiv, editor);
+
+        function addFileDragAndDropEventListeners (editorDiv, aceObject) {
+            console.log("AddEvent1");
+            editorDiv.addEventListener('dragover', function(e) {
+               stopEvent(e);
+            });
+            console.log("AddEvent2");
+            editorDiv.addEventListener('drop', function(e) {
+               putFileContentsInAceEditor(e.dataTransfer.files[0], aceObject);
+               stopEvent(e);
+            });
+
+            function putFileContentsInAceEditor(file, aceEditor) {
+                console.log("PutFileContents");
+                var reader, text;
+                reader = new FileReader();
+                reader.onload = (function (file) {
+                   text = file.target.result;
+                   aceEditor.getSession().setValue(text);
+                });
+                reader.readAsText(file);
+            }
+
+            function stopEvent(e) {
+                e.stopPropagation();
+                e.preventDefault();
+            }
+        }
+        console.log("FileDAD - OUT");
+    }
+
     
 
 });

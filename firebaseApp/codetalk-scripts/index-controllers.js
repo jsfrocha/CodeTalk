@@ -143,6 +143,12 @@ app.controller('GroupsCtrl', function($scope, $rootScope) {
             else return true;
         }
 
+        $scope.groupsAlert = {
+            alertType: "",
+            message: "",
+            isShown: false
+        };
+
         var currentUserGroupRef = $rootScope.getFBRef('users/' + $rootScope.auth.user.uid + '/allowedGroups');
 
         var newGroupName = $scope.newGroupName;
@@ -192,11 +198,6 @@ app.controller('GroupsCtrl', function($scope, $rootScope) {
         }
 
 
-        $scope.groupsAlert = {
-            alertType: "",
-            message: "",
-            isShown: false
-        };
 
         function showAlert(alertType, message) {
             $scope.groupsAlert.message = message;
@@ -220,13 +221,13 @@ app.controller('GroupsCtrl', function($scope, $rootScope) {
 
 app.controller('SingleGroupCtrl', function($scope, $rootScope, $routeParams) {
 
+
     $scope.currentGroupFull = $routeParams.groupName;
-
     $scope.currentGroup = $routeParams.groupName.split("_")[0];
-    var currentUserId = $rootScope.auth.user.uid;
     $scope.isUserAdmin = false;
-
     $scope.saveLoader = false;
+
+    var currentUserId = $rootScope.auth.user.uid;
 
     $scope.editor = ace.edit("code-editor");
     $scope.editor.setTheme("ace/theme/github");
@@ -235,6 +236,9 @@ app.controller('SingleGroupCtrl', function($scope, $rootScope, $routeParams) {
     $scope.modalEditor.setTheme("ace/theme/github");
     $scope.modalEditor.setReadOnly(true);
 
+    var editorDiv = document.getElementById('code-editor');
+
+    $rootScope.setupFileDragAndDrop(editorDiv, $scope.editor);
 
     var groupsRef = $rootScope.getNormalFBRef('groups');
     groupsRef.once('value', function(snap) {
