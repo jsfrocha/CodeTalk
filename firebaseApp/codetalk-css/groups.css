@@ -112,6 +112,19 @@
     border-radius: 4px;
 }
 
+#view-modal-code-editor {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    margin-top: 254px;
+    margin-right: 20px;
+    margin-left: 20px;
+    border: 1px solid #cccccc;
+    border-radius: 4px;
+}
+
 .modal-addNote {
     min-height: 500px;
 }
@@ -131,5 +144,11 @@
 
 .list-group-item {
     cursor: pointer;
+}
+
+.noteContent {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
 }
 

@@ -221,11 +221,14 @@ app.controller('GroupsCtrl', function($scope, $rootScope) {
 
 app.controller('SingleGroupCtrl', function($scope, $rootScope, $routeParams) {
 
-
     $scope.currentGroupFull = $routeParams.groupName;
     $scope.currentGroup = $routeParams.groupName.split("_")[0];
     $scope.isUserAdmin = false;
     $scope.saveLoader = false;
+
+    $scope.notes = $rootScope.getFBRef('groups/'+$scope.currentGroupFull+'/notes');
+
+    $scope.hasNotes = function () { return !angular.equals({}, $scope.notes); }
 
     var currentUserId = $rootScope.auth.user.uid;
 
@@ -234,11 +237,16 @@ app.controller('SingleGroupCtrl', function($scope, $rootScope, $routeParams) {
 
     $scope.modalEditor = ace.edit("modal-code-editor");
     $scope.modalEditor.setTheme("ace/theme/github");
-    $scope.modalEditor.setReadOnly(true);
+
+    $scope.viewModalEditor = ace.edit("view-modal-code-editor");
+    $scope.viewModalEditor.setTheme("ace/theme/github");
+    $scope.viewModalEditor.setReadOnly(true);
 
     var editorDiv = document.getElementById('code-editor');
+    var modalEditorDiv = document.getElementById('modal-code-editor');
 
     $rootScope.setupFileDragAndDrop(editorDiv, $scope.editor);
+    $rootScope.setupFileDragAndDrop(modalEditorDiv, $scope.modalEditor);
 
     var groupsRef = $rootScope.getNormalFBRef('groups');
     groupsRef.once('value', function(snap) {
@@ -250,6 +258,7 @@ app.controller('SingleGroupCtrl', function($scope, $rootScope, $routeParams) {
                 $scope.groupMode = child.val().mode;
                 $scope.editor.getSession().setMode("ace/mode/"+$scope.groupMode);
                 $scope.modalEditor.getSession().setMode("ace/mode/"+$scope.groupMode);
+                $scope.viewModalEditor.getSession().setMode("ace/mode/"+$scope.groupMode);
 
                 if (child.val().isCodeLocked == true) {
                     $scope.codeLocked = true;
@@ -280,38 +289,65 @@ app.controller('SingleGroupCtrl', function($scope, $rootScope, $routeParams) {
 
 
 
-    $scope.saveLockCode = function () {
+//    $scope.saveLockCode = function () {
+//        var code = $scope.editor.getSession().getValue();
+//        var currentGroup = $routeParams.groupName;
+//
+//        var currentGroupRef = $rootScope.getFBRef('groups/'+currentGroup);
+//
+//        $scope.saveLoader = true;
+//        if (!!code) {
+//            $scope.editor.setReadOnly(true);
+//
+//            currentGroupRef.$update({
+//               isCodeLocked: true,
+//               code: code
+//            });
+//
+//            $scope.codeLocked = true;
+//
+//
+//            $scope.saveLoader = false;
+//        }
+//        else {
+//            $scope.saveLoader = false;
+//        }
+//    };
+
+    $scope.saveCode = function() {
         var code = $scope.editor.getSession().getValue();
         var currentGroup = $routeParams.groupName;
-        var currentUserId = $rootScope.auth.user.uid;
-
         var currentGroupRef = $rootScope.getFBRef('groups/'+currentGroup);
 
-        $scope.saveLoader = true;
         if (!!code) {
-            $scope.editor.setReadOnly(true);
-
             currentGroupRef.$update({
-               isCodeLocked: true,
                code: code
             });
-
-            $scope.codeLocked = true;
-
-            if (!$scope.$$phase) {  //SAFE APPLY TO ANGULAR
-                $scope.$apply();
-            }
-
-            $scope.saveLoader = false;
+            alert('Code Saved!');
+        } else {
+            alert('There is no Code to Save');
         }
-        else {
-            $scope.saveLoader = false;
+
+    };
+
+    $scope.lockCode = function() {
+        var currentGroup = $routeParams.groupName;
+        var currentGroupRef = $rootScope.getFBRef('groups/'+currentGroup);
+
+        currentGroupRef.$update({
+           isCodeLocked: true
+        });
+
+        $scope.editor.setReadOnly(true);
+        $scope.codeLocked = true;
+
+        if (!$scope.$$phase) {  //SAFE APPLY TO ANGULAR
+            $scope.$apply();
         }
     };
 
     $scope.unlockCode = function () {
         var currentGroup = $routeParams.groupName;
-        var currentUserId = $rootScope.auth.user.uid;
         var currentGroupRef = $rootScope.getFBRef('groups/'+currentGroup);
 
         $scope.saveLoader = true;
@@ -354,10 +390,23 @@ app.controller('SingleGroupCtrl', function($scope, $rootScope, $routeParams) {
                 $scope.isGroupPrivate = true;
             }
         });
+    };
 
+    $scope.viewNote = function (noteKey) {
+        $scope.noteToView = $rootScope.getFBRef('groups/'+$scope.currentGroupFull+'/notes/'+noteKey);
 
+        if (!$scope.$$phase) {  //SAFE APPLY TO ANGULAR
+            $scope.$apply();
+        }
 
+        $scope.viewModalEditor.getSession().setValue($scope.noteToView.code);
 
+        $scope.viewTitle = $scope.noteToView.title;
+        $scope.viewContent = $scope.noteToView.content;
+
+        var date = new Date($scope.noteToView.createdAt);
+        console.log('DateObj: '+date.toUTCString());
+        console.log('Date: '+$scope.noteToView.createdAt);
     };
 
     $scope.editor.on('blur', function() {
@@ -395,19 +444,20 @@ app.controller('AddNoteCtrl', function($scope, $rootScope) {
 
     $scope.newNote = {};
 
-
+    $scope.modalEditor.on('blur', function() {
+        $scope.editorContent = $scope.modalEditor.getSession().getValue();
+    });
 
     $scope.addNote = function () {
         console.log("addnote in");
         var currentUserId = $rootScope.auth.user.uid;
         $scope.modalEditor.setValue($scope.codeContent);
 
-        if (typeof $scope.newNote != undefined && $scope.newNote.noteTitle && $scope.newNote.noteContent) {
+        if (typeof $scope.newNote != 'undefined' && $scope.newNote.noteTitle && $scope.newNote.noteContent) {
 
             var title = $scope.newNote.noteTitle;
             var content = $scope.newNote.noteContent;
-            var code = $scope.editor.session.getTextRange($scope.editor.getSelectionRange());
-
+            var noteCode = $scope.editorContent;
             var currentNoteRef = $rootScope.getFBRef('notes/'+$scope.currentGroup+'_'+title);
             var notesRef = $rootScope.getNormalFBRef('notes');
 
@@ -425,22 +475,28 @@ app.controller('AddNoteCtrl', function($scope, $rootScope) {
                 }
 
                 if (existingNotes.indexOf(title) == -1) {
-                    console.log("Set current Note - IN");
+                    var currentDate = new Date();
+                    var dateToAdd = currentDate.toUTCString();
+                    var currentUserEmail = $rootScope.auth.user.email;
+
                     //Set Note in /Notes -> [GROUPNAME]_[NOTETITLE]
                     currentNoteRef.$set({
                         content: content,
-                        code: code
+                        code: noteCode,
+                        createdAt: dateToAdd,
+                        createdBy: currentUserEmail
                     });
-                    console.log("Set current Note - OUT");
                     var groupNotesRef = $rootScope.getFBRef('groups/'+$scope.currentGroup + '_' + currentUserId+'/notes');
-                    console.log("Set group Note - IN");
+
                     //Add Note to Groups/Notes
                     groupNotesRef.$add({
                         title: title,
                         content: content,
-                        code: code
+                        code: noteCode,
+                        createdAt: dateToAdd,
+                        createdBy: currentUserEmail
                     });
-                    console.log("Set group note - OUT");
+
 
                     $scope.newNote.noteTitle = "";
                     $scope.newNote.noteContent = "";
@@ -454,7 +510,7 @@ app.controller('AddNoteCtrl', function($scope, $rootScope) {
             console.log("Note\n");
             console.log("Title: "+title+"\n");
             console.log("Content: "+content+"\n");
-            console.log("Code: "+code+"\n");
+            console.log("Code: "+noteCode+"\n");
 
 
         }
@@ -499,7 +555,7 @@ app.controller('DeleteGroupCtrl', function($scope, $rootScope, $location) {
     };
 });
 
-app.controller('ViewNoteCtrl', function($scope) {
+app.controller('ViewNoteCtrl', function($scope, $rootScope) {
 
 });
 

@@ -85,16 +85,14 @@ run(function($rootScope, $location, $firebaseSimpleLogin, $firebase) {
     }
 
     $rootScope.setupFileDragAndDrop = function (editorDiv, editor) {
-        debugger;
-        console.log("FileDAD - IN");
         addFileDragAndDropEventListeners(editorDiv, editor);
 
         function addFileDragAndDropEventListeners (editorDiv, aceObject) {
-            console.log("AddEvent1");
+
             editorDiv.addEventListener('dragover', function(e) {
                stopEvent(e);
             });
-            console.log("AddEvent2");
+
             editorDiv.addEventListener('drop', function(e) {
                putFileContentsInAceEditor(e.dataTransfer.files[0], aceObject);
                stopEvent(e);
@@ -116,7 +114,6 @@ run(function($rootScope, $location, $firebaseSimpleLogin, $firebase) {
                 e.preventDefault();
             }
         }
-        console.log("FileDAD - OUT");
     }
 
     
