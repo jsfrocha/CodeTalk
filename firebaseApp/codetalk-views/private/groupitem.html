@@ -6,9 +6,10 @@
                     <button class="btn btn-danger" data-toggle="modal" data-target="#deleteGroupModal"><i class="fa fa-times"></i>&nbsp;&nbsp;Leave Group</button>
                 </div>
                 {{currentGroup}}
-                <div class="btn-group pull-right">
-                    <button class="btn btn-warning" data-toggle="modal" data-target="#inviteFriendsModal">Invite Friend</button>
-                    <button class="btn btn-warning">Make Public</button>
+                <div class="btn-group pull-right" ng-show="isUserAdmin">
+                    <button class="btn btn-warning" data-toggle="modal" data-target="#inviteUserModal">Invite User</button>
+                    <button class="btn btn-warning" ng-click="changeGroupVisibility()" ng-cloak ng-show="isGroupPrivate">Make Public</button>
+                    <button class="btn btn-warning" ng-click="changeGroupVisibility()" ng-cloak ng-show="!isGroupPrivate">Make Private</button>
                 </div>
             </div>
         </div>
@@ -18,7 +19,7 @@
             <div class="ct-column-title">Code
                 <div class="codeTip">
                     <p style="display: inline; margin-right: -150px;">Select code when adding a note!</p>
-                    <button type="button" class="btn btn-info pull-right" style="margin-top: -15px;" ng-hide="codeLocked" ng-cloak ng-click="saveLockCode()"> <i class="fa fa-spinner fa-spin" ng-show="saveLoader"></i>&nbsp;Save & Lock Code</button>
+                    <button type="button" class="btn btn-info pull-right" style="margin-top: -15px;" ng-hide="codeLocked || !isUserAdmin" ng-cloak ng-click="saveLockCode()"> <i class="fa fa-spinner fa-spin" ng-show="saveLoader"></i>&nbsp;Save & Lock Code</button>
                     <button type="button" class="btn btn-info pull-right" style="margin-top: -15px;" ng-show="codeLocked && isUserAdmin" ng-cloak ng-click="unlockCode()"> <i class="fa fa-spinner fa-spin" ng-show="saveLoader"></i>&nbsp;Unlock Code</button>
                 </div>
             </div>
@@ -86,17 +87,23 @@
 
 </div>
 
-<!--Invite Friends Modal-->
+<!--Invite User Modal-->
 
-<div class="modal fade" id="inviteFriendsModal" tabindex="-1" role="dialog" aria-labelledby="inviteFriendsModalLabel" aria-hidden="true" ng-controller="InviteFriendsCtrl">
+<div class="modal fade" id="inviteUserModal" tabindex="-1" role="dialog" aria-labelledby="inviteUserModalLabel" aria-hidden="true" ng-controller="InviteFriendsCtrl">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-                <h4 class="modal-title" id="inviteFriendsModalLabel">Invite Friends</h4>
+                <h4 class="modal-title" id="inviteUserModalLabel">Invite User</h4>
             </div>
             <div class="modal-body">
-                ...
+                <div class="alert alert-groups {{groupsAlert.alertType}}" ng-show="groupsAlert.isShown">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true" ng-click="closeAlert()">&times;</button>
+                    {{groupsAlert.message}}
+                </div>
+                <div class="list-group">
+                    <a class="list-group-item" ng-hide="currentUser == user.$id" ng-click="addUserToGroup(user.$id, user.email)" ng-repeat="user in users | orderByPriority">{{user.email}}</a>
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>

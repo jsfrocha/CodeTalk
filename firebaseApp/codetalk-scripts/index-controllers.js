@@ -215,9 +215,7 @@ app.controller('GroupsCtrl', function($scope, $rootScope) {
 
 });
 
-app.controller('SingleGroupCtrl', function($scope, $rootScope, $routeParams) {
-
-    $scope.codeLocked = true;
+app.controller('SingleGroupCtrl', function($scope, $rootScope, $routeParams, GroupFactory) {
 
     $scope.currentGroup = $routeParams.groupName;
     var currentUserId = $rootScope.auth.user.uid;
@@ -236,7 +234,6 @@ app.controller('SingleGroupCtrl', function($scope, $rootScope, $routeParams) {
     var groupsRef = $rootScope.getNormalFBRef('groups');
     groupsRef.once('value', function(snap) {
         snap.forEach(function(child) {
-            console.log("child: "+child);
             if (child.name() == $scope.currentGroup + '_' + currentUserId) {
                 //Found current group
                 if (child.val().createdBy == currentUserId) $scope.isUserAdmin = true;
@@ -245,8 +242,21 @@ app.controller('SingleGroupCtrl', function($scope, $rootScope, $routeParams) {
                 $scope.editor.getSession().setMode("ace/mode/"+$scope.groupMode);
                 $scope.modalEditor.getSession().setMode("ace/mode/"+$scope.groupMode);
 
-                if (child.val().isCodeLocked == true) $scope.codeLocked = true;
-                else $scope.codeLocked = false;
+                if (child.val().isCodeLocked == true) {
+                    $scope.codeLocked = true;
+                    $scope.editor.setReadOnly(true);
+                }
+                else {
+                    $scope.codeLocked = false;
+                    $scope.editor.setReadOnly(false);
+                }
+
+                if (child.val().isPrivate) {
+                    $scope.isGroupPrivate = true;
+                }
+                else {
+                    $scope.isGroupPrivate = false;
+                }
 
                 if (child.val().code != '') {
                     $scope.editor.getSession().setValue(child.val().code);
@@ -256,8 +266,6 @@ app.controller('SingleGroupCtrl', function($scope, $rootScope, $routeParams) {
         if (!$scope.$$phase) {  //SAFE APPLY TO ANGULAR
             $scope.$apply();
         }
-
-
     });
 
 
@@ -274,10 +282,16 @@ app.controller('SingleGroupCtrl', function($scope, $rootScope, $routeParams) {
         if (!!code) {
             $scope.editor.setReadOnly(true);
 
-            currentGroupRef.$set({
+            currentGroupRef.$update({
                isCodeLocked: true,
                code: code
             });
+
+            $scope.codeLocked = true;
+
+            if (!$scope.$$phase) {  //SAFE APPLY TO ANGULAR
+                $scope.$apply();
+            }
 
             $scope.saveLoader = false;
         }
@@ -295,11 +309,45 @@ app.controller('SingleGroupCtrl', function($scope, $rootScope, $routeParams) {
 
         $scope.editor.setReadOnly(false);
 
-        currentGroupRef.$set({
+        currentGroupRef.$update({
            isCodeLocked: false
         });
 
+        $scope.codeLocked = false;
+
+        if (!$scope.$$phase) {  //SAFE APPLY TO ANGULAR
+            $scope.$apply();
+        }
+
         $scope.saveLoader = false;
+
+    };
+
+    //TODO: isPrivate flag is changed, but what is shown in Groups is the AllowedGroups, so it doesnt show the Public ones anyway...
+    $scope.changeGroupVisibility = function () {
+
+        var currentGroup = $routeParams.groupName;
+        var currentUserId = $rootScope.auth.user.uid;
+        var currentGroupRef = $rootScope.getFBRef('groups/'+currentGroup+'_'+currentUserId);
+
+        currentGroupRef.$on('loaded', function(data) {
+            console.log(data);
+            if (data.isPrivate) {
+                currentGroupRef.$update({
+                   isPrivate: false
+                });
+                $scope.isGroupPrivate = false;
+            }
+            else {
+                currentGroupRef.$update({
+                   isPrivate: true
+                });
+                $scope.isGroupPrivate = true;
+            }
+        });
+
+
+
 
     };
 
@@ -448,5 +496,53 @@ app.controller('ViewNoteCtrl', function($scope) {
 
 
 app.controller('InviteFriendsCtrl', function($scope, $rootScope, $routeParams) {
+
+    $scope.users = $rootScope.getFBRef('users');
+
+    $scope.currentUser = $rootScope.auth.user.uid;
+    //initListBoxes();
+
+    $scope.addUserToGroup = function (userId, userEmail) {
+
+        var userRef = $rootScope.getFBRef('users/'+userId+'/allowedGroups');
+        var userNormalRef = $rootScope.getNormalFBRef('users/'+userId+'/allowedGroups');
+        var currentGroup = $scope.currentGroup;
+        var adminUser = $rootScope.auth.user.uid;
+        var groupToAddTo = {};
+        var groupsRef = $rootScope.getNormalFBRef('groups');
+        var fullName = currentGroup + '_' + adminUser;
+        var alreadyHasGroup = false;
+
+        groupsRef.once('value', function(snap) {
+            snap.forEach(function(child) {
+                if (child.name() == fullName) {
+                    console.log(child.val().mode);
+                    console.log(child.val().createdBy);
+                    groupToAddTo = child;
+                }
+            });
+
+
+                userNormalRef.once('value', function(snap) {
+                    snap.forEach(function(child) {
+                        if (child.val().name == currentGroup) {
+                            alreadyHasGroup = true;
+                        }
+                    });
+
+                    if (!alreadyHasGroup) {
+                        userRef.$add({
+                            createdBy: groupToAddTo.val().createdBy,
+                            mode: groupToAddTo.val().mode,
+                            name: currentGroup
+                        });
+                        $scope.showAlert('alert-success', 'User '+userEmail+' was added to group '+currentGroup+'.');
+                    }
+                    else {
+                        $scope.showAlert('alert-danger', 'User '+userEmail+' is already in this group');
+                    }
+                });
+        });
+    };
 
 });

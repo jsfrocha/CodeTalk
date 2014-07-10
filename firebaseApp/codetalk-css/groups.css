@@ -128,3 +128,8 @@
 .codeTip {
     font-size: 14px;
 }
+
+.list-group-item {
+    cursor: pointer;
+}
+
