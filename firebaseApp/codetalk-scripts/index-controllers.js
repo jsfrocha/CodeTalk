@@ -148,13 +148,16 @@ app.controller('GroupsCtrl', function($scope, $rootScope) {
         var newGroupName = $scope.newGroupName;
         var selectedMode = $scope.selectedMode;
 
+        var fullGroupName = newGroupName + '_' + currentUserId;
+
         if (!!newGroupName) {
             if ($scope.selectedMode != "NONE") {
                 if (isNameValid(newGroupName)) { //Happy Path
                     currentUserGroupRef.$add({
                         name: newGroupName,
                         mode: selectedMode,
-                        createdBy: currentUserId
+                        createdBy: currentUserId,
+                        fullName: fullGroupName
                     })
                         .then(function (ref) {
                             var groupRef = $rootScope.getFBRef('groups/' + newGroupName + '_' + currentUserId);
@@ -215,9 +218,11 @@ app.controller('GroupsCtrl', function($scope, $rootScope) {
 
 });
 
-app.controller('SingleGroupCtrl', function($scope, $rootScope, $routeParams, GroupFactory) {
+app.controller('SingleGroupCtrl', function($scope, $rootScope, $routeParams) {
 
-    $scope.currentGroup = $routeParams.groupName;
+    $scope.currentGroupFull = $routeParams.groupName;
+
+    $scope.currentGroup = $routeParams.groupName.split("_")[0];
     var currentUserId = $rootScope.auth.user.uid;
     $scope.isUserAdmin = false;
 
@@ -234,7 +239,7 @@ app.controller('SingleGroupCtrl', function($scope, $rootScope, $routeParams, Gro
     var groupsRef = $rootScope.getNormalFBRef('groups');
     groupsRef.once('value', function(snap) {
         snap.forEach(function(child) {
-            if (child.name() == $scope.currentGroup + '_' + currentUserId) {
+               if (child.name() == $scope.currentGroupFull) {
                 //Found current group
                 if (child.val().createdBy == currentUserId) $scope.isUserAdmin = true;
 
@@ -276,7 +281,7 @@ app.controller('SingleGroupCtrl', function($scope, $rootScope, $routeParams, Gro
         var currentGroup = $routeParams.groupName;
         var currentUserId = $rootScope.auth.user.uid;
 
-        var currentGroupRef = $rootScope.getFBRef('groups/'+currentGroup+'_'+currentUserId);
+        var currentGroupRef = $rootScope.getFBRef('groups/'+currentGroup);
 
         $scope.saveLoader = true;
         if (!!code) {
@@ -303,7 +308,7 @@ app.controller('SingleGroupCtrl', function($scope, $rootScope, $routeParams, Gro
     $scope.unlockCode = function () {
         var currentGroup = $routeParams.groupName;
         var currentUserId = $rootScope.auth.user.uid;
-        var currentGroupRef = $rootScope.getFBRef('groups/'+currentGroup+'_'+currentUserId);
+        var currentGroupRef = $rootScope.getFBRef('groups/'+currentGroup);
 
         $scope.saveLoader = true;
 
@@ -506,7 +511,8 @@ app.controller('InviteFriendsCtrl', function($scope, $rootScope, $routeParams) {
 
         var userRef = $rootScope.getFBRef('users/'+userId+'/allowedGroups');
         var userNormalRef = $rootScope.getNormalFBRef('users/'+userId+'/allowedGroups');
-        var currentGroup = $scope.currentGroup;
+        var currentGroupFull = $routeParams.groupName;
+        var currentGroup = currentGroupFull.split("_")[0];
         var adminUser = $rootScope.auth.user.uid;
         var groupToAddTo = {};
         var groupsRef = $rootScope.getNormalFBRef('groups');
@@ -534,7 +540,8 @@ app.controller('InviteFriendsCtrl', function($scope, $rootScope, $routeParams) {
                         userRef.$add({
                             createdBy: groupToAddTo.val().createdBy,
                             mode: groupToAddTo.val().mode,
-                            name: currentGroup
+                            name: currentGroup,
+                            fullName: currentGroupFull
                         });
                         $scope.showAlert('alert-success', 'User '+userEmail+' was added to group '+currentGroup+'.');
                     }
