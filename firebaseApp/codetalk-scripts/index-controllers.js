@@ -1,15 +1,8 @@
-app.controller('IndexCtrl', function($rootScope) {
-    //Recycle Current User Groups (Delete /AllowedGroups that are no longer in /Groups
+app.controller('IndexCtrl', function($rootScope) { });
 
-});
-
-app.controller('LandingCtrl', function($scope) {
-
-});
+app.controller('LandingCtrl', function($scope) { });
 
 app.controller('NavbarCtrl', function($scope, $rootScope, $firebase, $location) {
-
-    console.log("Enter NavbarCtrl, RootScope Auth: "+angular.toJson($rootScope.auth));
 
     var emailValidation = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+/;
 
@@ -55,8 +48,6 @@ app.controller('NavbarCtrl', function($scope, $rootScope, $firebase, $location) 
 
         $rootScope.auth.$createUser($scope.signUpData.email, $scope.signUpData.password, true)//False -> Log-in after sign up ; True -> Don't Login after signup
             .then(function(user) {
-               // $rootScope.auth.user = user;
-                console.log('Create User. '+user.uid);
                 var newUserRef = $rootScope.getFBRef('users/'+user.uid);
                 //Add user to firebase and angular
 
@@ -89,7 +80,6 @@ app.controller('NavbarCtrl', function($scope, $rootScope, $firebase, $location) 
     $scope.logout = function () {
         $rootScope.auth.$logout();
         $rootScope.auth.user = null;
-        console.log("Logout Auth: "+$rootScope.auth.user);
         $location.path('/');
     }
 
@@ -112,9 +102,6 @@ app.controller('NavbarCtrl', function($scope, $rootScope, $firebase, $location) 
             $scope.$apply();
         }
     }
-
-
-
 });
 
 //Groups Page Controller
@@ -260,6 +247,24 @@ app.controller('SingleGroupCtrl', function($scope, $rootScope, $routeParams) {
                 $scope.modalEditor.getSession().setMode("ace/mode/"+$scope.groupMode);
                 $scope.viewModalEditor.getSession().setMode("ace/mode/"+$scope.groupMode);
 
+//                $scope.editorBinding = $rootScope.getFBRef('groups/'+$scope.currentGroupFull);
+//                $scope.codeBinding = $rootScope.getFBRef('groups/'+$scope.currentGroupFull+'/code');
+//
+//                   $scope.editor.on('blur', function(e) {
+//                       console.log('change. '+angular.toJson(e));
+//                       $scope.codeBinding.$transaction(function(currentData) {
+//                           return $scope.editor.getSession().getValue();
+//                       });
+//                   });
+//
+//                   $scope.codeBinding.$on('change', function() {
+//                      $scope.editor.getSession().setValue($scope.editorBinding.code);
+//                   });
+//
+//               $scope.editorBinding.$on('change', function() {
+//                   $scope.editor.setValue($scope.editorBinding.code);
+//               });
+
                 if (child.val().isCodeLocked == true) {
                     $scope.codeLocked = true;
                     $scope.editor.setReadOnly(true);
@@ -285,6 +290,8 @@ app.controller('SingleGroupCtrl', function($scope, $rootScope, $routeParams) {
             $scope.$apply();
         }
     });
+
+
 
     $scope.saveCode = function() {
         var code = $scope.editor.getSession().getValue();
@@ -347,7 +354,6 @@ app.controller('SingleGroupCtrl', function($scope, $rootScope, $routeParams) {
         var currentGroupRef = $rootScope.getFBRef('groups/'+currentGroup);
 
         currentGroupRef.$on('loaded', function(data) {
-            console.log(data);
             if (data.isPrivate) {
                 currentGroupRef.$update({
                    isPrivate: false
@@ -376,8 +382,6 @@ app.controller('SingleGroupCtrl', function($scope, $rootScope, $routeParams) {
         $scope.viewContent = $scope.noteToView.content;
 
         var date = new Date($scope.noteToView.createdAt);
-        console.log('DateObj: '+date.toUTCString());
-        console.log('Date: '+$scope.noteToView.createdAt);
     };
 
     $scope.editor.on('blur', function() {
@@ -408,7 +412,6 @@ app.controller('SingleGroupCtrl', function($scope, $rootScope, $routeParams) {
         }
     }
 
-
 });
 
 app.controller('AddNoteCtrl', function($scope, $rootScope) {
@@ -420,8 +423,6 @@ app.controller('AddNoteCtrl', function($scope, $rootScope) {
     });
 
     $scope.addNote = function () {
-        console.log("addnote in");
-        var currentUserId = $rootScope.auth.user.uid;
         $scope.modalEditor.setValue($scope.codeContent);
 
         if (typeof $scope.newNote != 'undefined' && $scope.newNote.noteTitle && $scope.newNote.noteContent) {
@@ -478,12 +479,6 @@ app.controller('AddNoteCtrl', function($scope, $rootScope) {
                     $scope.showAlert('alert-danger', 'Note "'+title+'" already exists in this group');
                 }
             });
-            console.log("Note\n");
-            console.log("Title: "+title+"\n");
-            console.log("Content: "+content+"\n");
-            console.log("Code: "+noteCode+"\n");
-
-
         }
         else {
            $scope.showAlert('alert-danger', 'Both fields are mandatory');
@@ -499,9 +494,6 @@ app.controller('DeleteGroupCtrl', function($scope, $rootScope, $location) {
 
         var currentGroup = $scope.currentGroup;
         var currentUser = $rootScope.auth.user.uid;
-
-        console.log(groupNameConfirmation);
-        console.log(currentGroup);
 
         if (groupNameConfirmation == currentGroup) {
             var groupsRef = $rootScope.getFBRef('users/'+currentUser+'/allowedGroups');
@@ -526,9 +518,7 @@ app.controller('DeleteGroupCtrl', function($scope, $rootScope, $location) {
     };
 });
 
-app.controller('ViewNoteCtrl', function($scope, $rootScope) {
-
-});
+app.controller('ViewNoteCtrl', function($scope, $rootScope) { });
 
 
 app.controller('InviteFriendsCtrl', function($scope, $rootScope, $routeParams) {
@@ -553,34 +543,29 @@ app.controller('InviteFriendsCtrl', function($scope, $rootScope, $routeParams) {
         groupsRef.once('value', function(snap) {
             snap.forEach(function(child) {
                 if (child.name() == fullName) {
-                    console.log(child.val().mode);
-                    console.log(child.val().createdBy);
                     groupToAddTo = child;
                 }
             });
-
-
-                userNormalRef.once('value', function(snap) {
-                    snap.forEach(function(child) {
-                        if (child.val().name == currentGroup) {
-                            alreadyHasGroup = true;
-                        }
-                    });
-
-                    if (!alreadyHasGroup) {
-                        userRef.$add({
-                            createdBy: groupToAddTo.val().createdBy,
-                            mode: groupToAddTo.val().mode,
-                            name: currentGroup,
-                            fullName: currentGroupFull
-                        });
-                        $scope.showAlert('alert-success', 'User '+userEmail+' was added to group '+currentGroup+'.');
-                    }
-                    else {
-                        $scope.showAlert('alert-danger', 'User '+userEmail+' is already in this group');
+            userNormalRef.once('value', function(snap) {
+                snap.forEach(function(child) {
+                    if (child.val().name == currentGroup) {
+                        alreadyHasGroup = true;
                     }
                 });
+
+                if (!alreadyHasGroup) {
+                    userRef.$add({
+                        createdBy: groupToAddTo.val().createdBy,
+                        mode: groupToAddTo.val().mode,
+                        name: currentGroup,
+                        fullName: currentGroupFull
+                    });
+                    $scope.showAlert('alert-success', 'User '+userEmail+' was added to group '+currentGroup+'.');
+                }
+                else {
+                    $scope.showAlert('alert-danger', 'User '+userEmail+' is already in this group');
+                }
+            });
         });
     };
-
 });
