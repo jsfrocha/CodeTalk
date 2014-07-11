@@ -418,18 +418,14 @@ app.controller('AddNoteCtrl', function($scope, $rootScope) {
 
     $scope.newNote = {};
 
-    $scope.modalEditor.on('blur', function() {
-        $scope.editorContent = $scope.modalEditor.getSession().getValue();
-    });
-
     $scope.addNote = function () {
-        $scope.modalEditor.setValue($scope.codeContent);
 
         if (typeof $scope.newNote != 'undefined' && $scope.newNote.noteTitle && $scope.newNote.noteContent) {
 
             var title = $scope.newNote.noteTitle;
             var content = $scope.newNote.noteContent;
-            var noteCode = $scope.editorContent;
+            var noteCode = $scope.modalEditor.getSession().getValue();
+            console.log("NoteCode. "+noteCode);
             var currentNoteRef = $rootScope.getFBRef('notes/'+$scope.currentGroup+'_'+title);
             var notesRef = $rootScope.getNormalFBRef('notes');
 
