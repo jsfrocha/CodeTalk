@@ -462,7 +462,8 @@ app.controller('AddNoteCtrl', function($scope, $rootScope) {
                         content: content,
                         code: noteCode,
                         createdAt: dateToAdd,
-                        createdBy: currentUserEmail
+                        createdBy: currentUserEmail,
+                        inGroup: $scope.currentGroupFull
                     });
 
 
