@@ -213,6 +213,8 @@ app.controller('SingleGroupCtrl', function($scope, $rootScope, $routeParams) {
     $scope.isUserAdmin = false;
     $scope.saveLoader = false;
 
+    $scope.viewArchived = false;
+
     $scope.notes = $rootScope.getFBRef('groups/'+$scope.currentGroupFull+'/notes');
 
     $scope.hasNotes = function () { return !angular.equals({}, $scope.notes); }
@@ -380,6 +382,8 @@ app.controller('SingleGroupCtrl', function($scope, $rootScope, $routeParams) {
 
         $scope.viewTitle = $scope.noteToView.title;
         $scope.viewContent = $scope.noteToView.content;
+        $scope.isArchived = $scope.noteToView.isArchived;
+        $scope.noteKey = noteKey;
 
         var date = new Date($scope.noteToView.createdAt);
     };
@@ -387,6 +391,10 @@ app.controller('SingleGroupCtrl', function($scope, $rootScope, $routeParams) {
     $scope.editor.on('blur', function() {
        $scope.modalEditor.getSession().setValue($scope.editor.session.getTextRange($scope.editor.getSelectionRange()));
     });
+
+    $scope.toggleViewArchived = function() {
+        $scope.viewArchived = !$scope.viewArchived;
+    };
 
 
 
@@ -463,7 +471,8 @@ app.controller('AddNoteCtrl', function($scope, $rootScope) {
                         code: noteCode,
                         createdAt: dateToAdd,
                         createdBy: currentUserEmail,
-                        inGroup: $scope.currentGroupFull
+                        inGroup: $scope.currentGroupFull,
+                        isArchived: false
                     });
 
 
@@ -515,7 +524,24 @@ app.controller('DeleteGroupCtrl', function($scope, $rootScope, $location) {
     };
 });
 
-app.controller('ViewNoteCtrl', function($scope, $rootScope) { });
+app.controller('ViewNoteCtrl', function($scope, $rootScope, $routeParams) {
+    $scope.currentGroupFull = $routeParams.groupName;
+    $scope.archiveNote = function(isArchived) {
+        var currentNoteRef = $rootScope.getFBRef('groups/'+$scope.currentGroupFull+'/notes/'+$scope.noteKey);
+        if (isArchived) {
+            currentNoteRef.$update({
+                isArchived: false
+            });
+        }
+        else {
+            currentNoteRef.$update({
+                isArchived: true
+            });
+        }
+
+
+    };
+});
 
 
 app.controller('InviteFriendsCtrl', function($scope, $rootScope, $routeParams) {

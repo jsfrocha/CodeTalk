@@ -32,21 +32,36 @@
                 <div class="codeTip">Select code when adding a note!</div>
             </div>
             <button class="btn btn-success btn-full-width" data-toggle="modal" data-target="#addNoteModal"><i class="fa fa-plus"></i>&nbsp;&nbsp;Add Note</button>
+            <button class="btn btn-info btn-full-width" ng-click="toggleViewArchived()" ng-show="!viewArchived" data-toggle="toggle"><i class="fa fa-eye"></i>&nbsp;&nbsp;View Archived</button>
+            <button class="btn btn-info btn-full-width" ng-click="toggleViewArchived()" ng-show="viewArchived" data-toggle="toggle"><i class="fa fa-eye-slash"></i>&nbsp;&nbsp;Hide Archived</button>
             <div class="panel panel-default" style="margin-top: 20px;">
                 <div class="list-group">
                     <a class="list-group-item" ng-hide="hasNotes()" data-toggle="modal" data-target="#addNoteModal">
                         <h4 class="list-group-item-heading">No Notes ATM</h4>
                         <p class="list-group-item-text">Add a new one !</p>
                     </a>
-                    <a class="list-group-item" ng-repeat="note in notes | orderByPriority | reverse" ng-click="viewNote(note.$id)" data-toggle="modal" data-target="#viewNoteModal">
+                    <a class="list-group-item" ng-repeat="note in notes | orderByPriority | reverse" ng-click="viewNote(note.$id)" data-toggle="modal" data-target="#viewNoteModal" ng-show="!note.isArchived">
                         <h4 class="list-group-item-heading">{{note.title}}</h4>
                         <p class="list-group-item-text noteContent">{{note.content}}</p>
                         <hr/>
                         <div class="row">
-                            <div class="col-xs-6">
+                            <div class="col-sm-6">
                                 <p class="list-group-item-text">{{note.createdBy}}</p>
                             </div>
-                            <div class="col-xs-6">
+                            <div class="col-md-6">
+                                <p class="list-group-item-text pull-right">{{note.createdAt}}</p>
+                            </div>
+                        </div>
+                    </a>
+                    <a class="list-group-item" ng-repeat="note in notes | orderByPriority | reverse" ng-click="viewNote(note.$id)" data-toggle="modal" data-target="#viewNoteModal" ng-show="note.isArchived && viewArchived" style="opacity: 0.3">
+                        <h4 class="list-group-item-heading">{{note.title}}</h4>
+                        <p class="list-group-item-text noteContent">{{note.content}}</p>
+                        <hr/>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <p class="list-group-item-text">{{note.createdBy}}</p>
+                            </div>
+                            <div class="col-md-6">
                                 <p class="list-group-item-text pull-right">{{note.createdAt}}</p>
                             </div>
                         </div>
@@ -116,6 +131,8 @@
                     </form>
                 </div>
                 <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" ng-click="archiveNote(isArchived)" data-dismiss="modal" ng-show="!isArchived">Archive Note</button>
+                    <button type="button" class="btn btn-warning" ng-click="archiveNote(isArchived)" data-dismiss="modal" ng-show="isArchived">Remove from Archive</button>
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                 </div>
             </div>
