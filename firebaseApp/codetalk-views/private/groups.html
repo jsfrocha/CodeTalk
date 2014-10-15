@@ -27,10 +27,16 @@
 
                 </form>
                 <ul class="nav nav-pills nav-stacked">
-                    <li ng-repeat="group in groups | orderByPriority">
+                    <li ng-repeat="group in groups | orderByPriority" ng-hide="!group.isPrivate">
                         <a id="{{group.$id}}" href="#/start/{{group.fullName}}" class="groupItem">
                             <span>{{group.name}}</span>
                             <span class="pull-right">{{group.mode}}</span>
+                        </a>
+                    </li>
+                    <li ng-repeat="oGroup in overallGroups | orderByPriority" ng-hide="oGroup.isPrivate">
+                        <a id="{{oGroup.$id}}" href="#/start/{{oGroup.$id}}" class="groupItem">
+                            <span>{{oGroup.$id.substring(0, oGroup.$id.indexOf('_'))}}</span>
+                            <span class="pull-right">(Public Group)&nbsp;&nbsp;&nbsp;&nbsp;{{oGroup.mode}}</span>
                         </a>
                     </li>
                 </ul>

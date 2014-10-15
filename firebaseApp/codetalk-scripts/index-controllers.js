@@ -120,11 +120,13 @@ app.controller('GroupsCtrl', function($scope, $rootScope) {
 
     var aceModesRef = $rootScope.getFBRef('aceModes');
     var currentUserGroupsRef = $rootScope.getFBRef('users/'+$rootScope.auth.user.uid+'/allowedGroups');
+    var overallGroups = $rootScope.getFBRef('groups');
     var currentUserId = $rootScope.auth.user.uid;
 
     //Remove leftover modal backdrop
     angular.element('.modal-backdrop').remove();
 
+    $scope.overallGroups = overallGroups;
     $scope.groups = currentUserGroupsRef;
     $scope.selectedMode = "NONE";
     $scope.aceModes = aceModesRef;
@@ -161,7 +163,8 @@ app.controller('GroupsCtrl', function($scope, $rootScope) {
                         name: newGroupName,
                         mode: selectedMode,
                         createdBy: currentUserId,
-                        fullName: fullGroupName
+                        fullName: fullGroupName,
+                        isPrivate: true
                     })
                         .then(function (ref) {
                             var groupRef = $rootScope.getFBRef('groups/' + newGroupName + '_' + currentUserId);
@@ -360,12 +363,33 @@ app.controller('SingleGroupCtrl', function($scope, $rootScope, $routeParams) {
 
     };
 
-    //TODO: isPrivate flag is changed, but what is shown in Groups is the AllowedGroups, so it doesnt show the Public ones anyway...
     $scope.changeGroupVisibility = function () {
 
         var currentGroup = $routeParams.groupName;
         var currentGroupRef = $rootScope.getFBRef('groups/'+currentGroup);
+        var currentUserGroups= $rootScope.getNormalFBRef('users/'+$rootScope.auth.user.uid+'/allowedGroups');
 
+        //Update isPrivate in /Users/CurrentUser/AllowedGroups
+        currentUserGroups.once('value', function(data) {
+           data.forEach(function(child) {
+              console.log(child.val());
+              if (child.val().fullName == currentGroup) {
+                  if (child.val().isPrivate) {
+                      child.ref().update({
+                          isPrivate: false
+                      });
+                  }
+                  else {
+                      child.ref().update({
+                          isPrivate: true
+                      });
+                  }
+
+              }
+           });
+        });
+
+        //Update isPrivate in /Groups
         currentGroupRef.$on('loaded', function(data) {
             if (data.isPrivate) {
                 currentGroupRef.$update({
