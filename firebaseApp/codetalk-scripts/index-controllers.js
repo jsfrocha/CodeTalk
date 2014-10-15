@@ -30,12 +30,23 @@ app.controller('NavbarCtrl', function($scope, $rootScope, $firebase, $location) 
                 $scope.authLoader = false;
                 $location.path('/start');
             }, function (error) {
-                if (error.code == 'INVALID_USER') {
-                    showAlert('alert-danger', 'User does not exist');
+                var message;
+                if (error) {
+                    switch (error.code) {
+                        case "INVALID_PASSWORD": message = 'The specified password is invalid.'; break;
+                        case "INVALID_USER": message = 'The specified user does not exist.'; break;
+                        case "INVALID_EMAIL": message = 'The specified e-mail is invalid.'; break;
+                        default: message = 'An unknown error occurred in the log-in process.'; console.log(angular.toJson(error)); break;
+
+                    }
+                    showAlert('alert-danger', message);
                     $scope.emailAuth = '';
                     $scope.passwordAuth = '';
                     angular.element('#signInEmailId').val('');
                     angular.element('#signInPasswordId').val('');
+                    $scope.authLoader = false;
+                }
+                else {
                     $scope.authLoader = false;
                 }
             })
