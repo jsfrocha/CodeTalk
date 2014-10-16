@@ -597,11 +597,13 @@ app.controller('InviteFriendsCtrl', function($scope, $rootScope, $routeParams) {
         var groupsRef = $rootScope.getNormalFBRef('groups');
         var fullName = currentGroup + '_' + adminUser;
         var alreadyHasGroup = false;
+        var privateSetting;
 
         groupsRef.once('value', function(snap) {
             snap.forEach(function(child) {
                 if (child.name() == fullName) {
                     groupToAddTo = child;
+                    privateSetting = child.val().isPrivate;
                 }
             });
             userNormalRef.once('value', function(snap) {
@@ -616,7 +618,8 @@ app.controller('InviteFriendsCtrl', function($scope, $rootScope, $routeParams) {
                         createdBy: groupToAddTo.val().createdBy,
                         mode: groupToAddTo.val().mode,
                         name: currentGroup,
-                        fullName: currentGroupFull
+                        fullName: currentGroupFull,
+                        isPrivate: privateSetting
                     });
                     $scope.showAlert('alert-success', 'User '+userEmail+' was added to group '+currentGroup+'.');
                 }
